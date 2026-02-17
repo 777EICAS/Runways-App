@@ -15,20 +15,25 @@ final class PrivateNotesStore {
         load()
     }
 
-    func notes(for airfieldId: String) -> [PrivateNote] {
-        notes.filter { $0.airfieldId == airfieldId }
-            .sorted { $0.updatedAt > $1.updatedAt }
+    func notes(for airfieldId: String, category: NoteCategory? = nil) -> [PrivateNote] {
+        var result = notes.filter { $0.airfieldId == airfieldId }
+        if let category {
+            result = result.filter { $0.category == category }
+        }
+        return result.sorted { $0.updatedAt > $1.updatedAt }
     }
 
-    func add(airfieldId: String, content: String) {
-        let note = PrivateNote(airfieldId: airfieldId, content: content)
+    func add(airfieldId: String, title: String, body: String, category: NoteCategory = .general) {
+        let note = PrivateNote(airfieldId: airfieldId, title: title, body: body, category: category)
         notes.append(note)
         save()
     }
 
-    func update(_ note: PrivateNote, content: String) {
+    func update(_ note: PrivateNote, title: String, body: String, category: NoteCategory) {
         guard let index = notes.firstIndex(where: { $0.id == note.id }) else { return }
-        notes[index].content = content
+        notes[index].title = title
+        notes[index].body = body
+        notes[index].category = category
         notes[index].updatedAt = Date()
         save()
     }

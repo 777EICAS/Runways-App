@@ -21,7 +21,7 @@ struct PublicBoardSection: View {
                 if !isOnline {
                     Text("Offline")
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(AppTheme.lavender)
+                        .foregroundStyle(AppTheme.textPrimary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
                         .background(Capsule().fill(AppTheme.lavenderLight))
@@ -41,13 +41,13 @@ struct PublicBoardSection: View {
             if !isOnline {
                 Text("Public notes are cached. Posting and voting require an internet connection.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppTheme.textSecondary)
             }
 
             if notes.isEmpty && !isComposing {
                 Text("No pilot notes yet. When online, tap **Post** to share your experience.")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppTheme.textSecondary)
                     .padding(.vertical, 20)
                     .padding(.horizontal, 4)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -67,10 +67,11 @@ struct PublicBoardSection: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(note.content)
                 .font(.body)
+                .foregroundStyle(AppTheme.textPrimary)
             HStack {
                 Text(note.createdAt, style: .date)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppTheme.textSecondary)
                 Spacer()
                 HStack(spacing: 16) {
                     thumbsButton(noteId: note.id, vote: .up, count: note.thumbsUp)
@@ -95,10 +96,10 @@ struct PublicBoardSection: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: vote == .up ? "hand.thumbsup.fill" : "hand.thumbsdown.fill")
-                    .foregroundStyle(isSelected ? AppTheme.lavender : .secondary)
+                    .foregroundStyle(isSelected ? AppTheme.lavender : AppTheme.textSecondary)
                 Text("\(count)")
                     .font(.caption.monospacedDigit())
-                    .foregroundStyle(isSelected ? AppTheme.lavender : .secondary)
+                    .foregroundStyle(isSelected ? AppTheme.lavender : AppTheme.textSecondary)
             }
         }
         .buttonStyle(.plain)

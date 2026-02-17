@@ -23,17 +23,7 @@ struct AirfieldDetailView: View {
                 .padding(AppTheme.cardPadding)
             }
         }
-        .background(
-            LinearGradient(
-                colors: [
-                    AppTheme.headerGradientBottom,
-                    AppTheme.pageBackgroundBlue,
-                    AppTheme.skyBlueLight.opacity(0.6)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
+        .background(SkySunsetBackground())
         .scrollContentBackground(.hidden)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -43,8 +33,7 @@ struct AirfieldDetailView: View {
             HStack(spacing: 12) {
                 Image(systemName: "airplane.departure")
                     .font(.system(size: 36, weight: .medium))
-                    .foregroundStyle(.white)
-                    .shadow(color: AppTheme.headerBlue.opacity(0.5), radius: 1, x: 0, y: 1)
+                    .foregroundStyle(AppTheme.headerBlue)
                 if let flag = airfield.countryFlag {
                     Text(flag)
                         .font(.system(size: 36))
@@ -55,17 +44,17 @@ struct AirfieldDetailView: View {
             HStack(alignment: .center, spacing: 20) {
                 Text(airfield.name.uppercased())
                     .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(AppTheme.headerBlue)
+                    .foregroundStyle(AppTheme.textPrimary)
                     .multilineTextAlignment(.center)
                 VStack(alignment: .leading, spacing: 2) {
                     if let iata = airfield.iataCode {
                         Text(iata)
                             .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.95))
+                            .foregroundStyle(AppTheme.textSecondary)
                     }
                     Text(airfield.icaoCode)
                         .font(.system(size: 16, weight: airfield.iataCode != nil ? .medium : .semibold))
-                        .foregroundStyle(.white.opacity(airfield.iataCode != nil ? 0.85 : 0.95))
+                        .foregroundStyle(AppTheme.textSecondary)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -74,16 +63,6 @@ struct AirfieldDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 8)
-        .background(
-            LinearGradient(
-                colors: [
-                    AppTheme.headerGradientTop,
-                    AppTheme.headerGradientBottom
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
     }
 }
 

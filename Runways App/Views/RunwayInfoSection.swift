@@ -30,7 +30,7 @@ struct RunwayInfoSection: View {
                     Spacer()
                     Image(systemName: isAirfieldInfoExpanded ? "chevron.up" : "chevron.down")
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(AppTheme.mint)
+                        .foregroundStyle(AppTheme.textSecondary)
                 }
                 .padding(.vertical, 4)
                 .contentShape(Rectangle())
@@ -39,7 +39,7 @@ struct RunwayInfoSection: View {
 
             if isAirfieldInfoExpanded {
                 VStack(alignment: .leading, spacing: 12) {
-                    infoRow(label: "Elevation", value: "\(airfield.elevationMeters) m MSL")
+                    infoRow(label: "Elevation", value: "\(Int(Double(airfield.elevationMeters) * 3.28084)) ft MSL")
                     if let iata = airfield.iataCode {
                         infoRow(label: "IATA", value: iata)
                     }
@@ -64,7 +64,7 @@ struct RunwayInfoSection: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 Text("Runways")
                     .font(.title3.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(AppTheme.textPrimary)
             }
             .padding(.bottom, 12)
 
@@ -88,11 +88,11 @@ struct RunwayInfoSection: View {
                 HStack {
                     Text("Runway \(runway.designation)")
                         .font(.headline)
-                        .foregroundStyle(AppTheme.mint)
+                        .foregroundStyle(AppTheme.textPrimary)
                     Spacer()
                     Image(systemName: expandedRunwayIds.contains(runway.id) ? "chevron.up" : "chevron.down")
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(AppTheme.mint)
+                        .foregroundStyle(AppTheme.textSecondary)
                 }
                 .padding(AppTheme.cardPadding)
                 .contentShape(Rectangle())
@@ -106,11 +106,11 @@ struct RunwayInfoSection: View {
                     infoRow(label: "Width", value: "\(runway.widthMeters) m")
                     HStack {
                         Text("Approaches")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(AppTheme.textSecondary)
                         Spacer()
                         Text(runway.approachTypes.joined(separator: ", "))
                             .fontWeight(.semibold)
-                            .foregroundStyle(AppTheme.mint)
+                            .foregroundStyle(AppTheme.textPrimary)
                     }
                 }
                 .padding(AppTheme.cardPadding)
@@ -125,11 +125,11 @@ struct RunwayInfoSection: View {
     private func infoRow(label: String, value: String) -> some View {
         HStack {
             Text(label)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppTheme.textSecondary)
             Spacer()
             Text(value)
                 .fontWeight(.semibold)
-                .foregroundStyle(AppTheme.mint)
+                .foregroundStyle(AppTheme.textPrimary)
         }
     }
 }

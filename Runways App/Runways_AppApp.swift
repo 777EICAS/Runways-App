@@ -11,7 +11,10 @@ import SwiftUI
 struct Runways_AppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ZStack {
+                SkySunsetBackground()
+                ContentView()
+            }
         }
     }
 }

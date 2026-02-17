@@ -27,6 +27,16 @@ enum AppTheme {
     /// Soft blue for full-page background (continues header theme).
     static let pageBackgroundBlue = Color(red: 0.82, green: 0.91, blue: 1.0)
 
+    /// High-contrast text for readability on light backgrounds.
+    static let textPrimary = Color(white: 0.12)
+    static let textSecondary = Color(white: 0.35)
+    static let textTertiary = Color(white: 0.5)
+
+    /// Sky-to-sunset gradient (light blue at top → light orange at bottom).
+    static let skyGradientTop = Color(red: 0.7, green: 0.85, blue: 0.98)
+    static let skyGradientMiddle = Color(red: 0.9, green: 0.88, blue: 0.92)
+    static let sunsetGradientBottom = Color(red: 1.0, green: 0.88, blue: 0.75)
+
     // MARK: - Layout
     static let bubbleCorner: CGFloat = 20
     static let bubbleCornerSmall: CGFloat = 16
@@ -43,15 +53,34 @@ struct BubblyCardBackground: View {
         RoundedRectangle(cornerRadius: AppTheme.bubbleCorner)
             .fill(
                 LinearGradient(
-                    colors: [colorLight.opacity(0.6), colorLight.opacity(0.25)],
+                    colors: [
+                        Color.white.opacity(0.95),
+                        colorLight.opacity(0.85)
+                    ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.bubbleCorner)
-                    .stroke(color.opacity(0.3), lineWidth: 1)
+                    .stroke(color.opacity(0.35), lineWidth: 1)
             )
+    }
+}
+
+// MARK: - App-wide sky-to-sunset background
+struct SkySunsetBackground: View {
+    var body: some View {
+        LinearGradient(
+            colors: [
+                AppTheme.skyGradientTop,
+                AppTheme.skyGradientMiddle,
+                AppTheme.sunsetGradientBottom
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .ignoresSafeArea()
     }
 }
 
@@ -67,11 +96,11 @@ struct BubblySectionHeader: View {
                 .font(.title2)
                 .foregroundStyle(color)
                 .frame(width: 36, height: 36)
-                .background(color.opacity(0.2))
+                .background(color.opacity(0.25))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             Text(title)
                 .font(.title3.weight(.semibold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(AppTheme.textPrimary)
         }
     }
 }
