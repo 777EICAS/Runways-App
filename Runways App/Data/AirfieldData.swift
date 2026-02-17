@@ -64,6 +64,44 @@ enum AirfieldData {
         countryFlag: "🇬🇧"
     )
 
+    static let ewr: Airfield = Airfield(
+        id: "KEWR",
+        name: "Newark Liberty International",
+        icaoCode: "KEWR",
+        iataCode: "EWR",
+        elevationMeters: 5,
+        runways: [
+            Runway(
+                id: "KEWR-11-29",
+                designation: "11/29",
+                headingDegrees: 110,
+                reciprocalHeadingDegrees: 290,
+                lengthMeters: 2049,
+                widthMeters: 46,
+                approachTypes: ["ILS", "VFR"]
+            ),
+            Runway(
+                id: "KEWR-04L-22R",
+                designation: "04L/22R",
+                headingDegrees: 40,
+                reciprocalHeadingDegrees: 220,
+                lengthMeters: 3353,
+                widthMeters: 46,
+                approachTypes: ["ILS", "VFR"]
+            ),
+            Runway(
+                id: "KEWR-04R-22L",
+                designation: "04R/22L",
+                headingDegrees: 40,
+                reciprocalHeadingDegrees: 220,
+                lengthMeters: 3050,
+                widthMeters: 46,
+                approachTypes: ["ILS", "VFR"]
+            )
+        ],
+        countryFlag: "🇺🇸"
+    )
+
     /// All airfields for v1.
-    static var allAirfields: [Airfield] { [lhr, lgw] }
+    static var allAirfields: [Airfield] { [lhr, lgw, ewr] }
 }
