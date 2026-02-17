@@ -35,6 +35,35 @@ enum AirfieldData {
         countryFlag: "🇬🇧"
     )
 
-    /// All airfields for v1 (single airfield).
-    static var allAirfields: [Airfield] { [lhr] }
+    static let lgw: Airfield = Airfield(
+        id: "EGKK",
+        name: "London Gatwick",
+        icaoCode: "EGKK",
+        iataCode: "LGW",
+        elevationMeters: 62,
+        runways: [
+            Runway(
+                id: "EGKK-08R-26L",
+                designation: "08R/26L",
+                headingDegrees: 76,
+                reciprocalHeadingDegrees: 256,
+                lengthMeters: 3317,
+                widthMeters: 45,
+                approachTypes: ["ILS", "VFR"]
+            ),
+            Runway(
+                id: "EGKK-08L-26R",
+                designation: "08L/26R",
+                headingDegrees: 76,
+                reciprocalHeadingDegrees: 256,
+                lengthMeters: 2561,
+                widthMeters: 45,
+                approachTypes: ["ILS", "VFR"]
+            )
+        ],
+        countryFlag: "🇬🇧"
+    )
+
+    /// All airfields for v1.
+    static var allAirfields: [Airfield] { [lhr, lgw] }
 }
