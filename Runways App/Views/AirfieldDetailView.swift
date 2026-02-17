@@ -39,7 +39,7 @@ struct AirfieldDetailView: View {
     }
 
     private var airfieldHeader: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 0) {
             HStack(spacing: 12) {
                 Image(systemName: "airplane.departure")
                     .font(.system(size: 36, weight: .medium))
@@ -50,13 +50,30 @@ struct AirfieldDetailView: View {
                         .font(.system(size: 36))
                 }
             }
-            Text(airfield.name.uppercased())
-                .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(AppTheme.headerBlue)
-                .multilineTextAlignment(.center)
+            .padding(.top, 4)
+            .padding(.bottom, 16)
+            HStack(alignment: .center, spacing: 20) {
+                Text(airfield.name.uppercased())
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(AppTheme.headerBlue)
+                    .multilineTextAlignment(.center)
+                VStack(alignment: .leading, spacing: 2) {
+                    if let iata = airfield.iataCode {
+                        Text(iata)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.95))
+                    }
+                    Text(airfield.icaoCode)
+                        .font(.system(size: 16, weight: airfield.iataCode != nil ? .medium : .semibold))
+                        .foregroundStyle(.white.opacity(airfield.iataCode != nil ? 0.85 : 0.95))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 32)
+            .padding(.bottom, 24)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
+        .padding(.top, 8)
         .background(
             LinearGradient(
                 colors: [
