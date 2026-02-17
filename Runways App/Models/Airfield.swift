@@ -14,6 +14,8 @@ struct Airfield: Identifiable, Codable, Hashable {
     var runways: [Runway]
     /// Country flag emoji (e.g. "🇬🇧" for United Kingdom).
     var countryFlag: String?
+    /// Region for grouping (e.g. "Europe", "North America").
+    var region: String?
 }
 
 struct Runway: Identifiable, Codable, Hashable {

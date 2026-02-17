@@ -17,13 +17,16 @@ final class PublicBoardStore {
         load()
     }
 
-    func notes(for airfieldId: String) -> [PublicNote] {
-        notes.filter { $0.airfieldId == airfieldId }
-            .sorted { $0.createdAt > $1.createdAt }
+    func notes(for airfieldId: String, category: NoteCategory? = nil) -> [PublicNote] {
+        var result = notes.filter { $0.airfieldId == airfieldId }
+        if let category {
+            result = result.filter { $0.category == category }
+        }
+        return result.sorted { $0.createdAt > $1.createdAt }
     }
 
-    func add(airfieldId: String, content: String) {
-        let note = PublicNote(airfieldId: airfieldId, content: content)
+    func add(airfieldId: String, content: String, category: NoteCategory = .general) {
+        let note = PublicNote(airfieldId: airfieldId, content: content, category: category)
         notes.append(note)
         save()
     }

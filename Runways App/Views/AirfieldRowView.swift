@@ -20,9 +20,14 @@ struct AirfieldRowView: View {
                         )
                     )
                     .frame(width: 52, height: 52)
-                Text(airfield.iataCode ?? String(airfield.icaoCode.prefix(3)))
-                    .font(.system(.body, design: .rounded, weight: .bold))
-                    .foregroundStyle(AppTheme.skyBlue)
+                if let flag = airfield.countryFlag {
+                    Text(flag)
+                        .font(.system(size: 28))
+                } else {
+                    Text(airfield.iataCode ?? String(airfield.icaoCode.prefix(3)))
+                        .font(.system(.body, design: .rounded, weight: .bold))
+                        .foregroundStyle(AppTheme.skyBlue)
+                }
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(airfield.name)
