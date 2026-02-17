@@ -70,12 +70,21 @@ struct AirfieldDetailView: View {
     }
 
     private var codesInline: some View {
-        HStack(spacing: 8) {
-            if let iata = airfield.iataCode {
-                codePill(label: "IATA", value: iata)
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                if let iata = airfield.iataCode {
+                    codePill(label: "IATA", value: iata)
+                }
+                codePill(label: "ICAO", value: airfield.icaoCode)
+                codePill(label: "Elev", value: "\(Int(round(Double(airfield.elevationMeters) * 3.28084))) ft")
+                if let hours = airfield.operatingHours {
+                    codePill(label: "Hours", value: hours)
+                }
+                if let hasCurfew = airfield.hasCurfew {
+                    curfewPill(hasCurfew: hasCurfew)
+                }
             }
-            codePill(label: "ICAO", value: airfield.icaoCode)
-            codePill(label: "Elev", value: "\(Int(round(Double(airfield.elevationMeters) * 3.28084))) ft")
+            .padding(.vertical, 2)
         }
     }
 
@@ -87,6 +96,28 @@ struct AirfieldDetailView: View {
             Text(value)
                 .font(.caption.weight(.bold))
                 .foregroundStyle(AppTheme.textSecondary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white.opacity(0.55))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.white.opacity(0.35), lineWidth: 1)
+        )
+    }
+
+    /// Separate curfew pill: tick = has curfew, cross = no curfew.
+    private func curfewPill(hasCurfew: Bool) -> some View {
+        HStack(spacing: 6) {
+            Text("Curfew")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(AppTheme.textTertiary)
+            Image(systemName: hasCurfew ? "checkmark.circle.fill" : "xmark.circle.fill")
+                .font(.caption)
+                .foregroundStyle(hasCurfew ? Color.green : Color(red: 0.85, green: 0.35, blue: 0.35))
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)

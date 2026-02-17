@@ -23,6 +23,11 @@ final class PrivateNotesStore {
         return result.sorted { $0.updatedAt > $1.updatedAt }
     }
 
+    /// Airfield IDs that have at least one note (for "My notes" list filter).
+    func airfieldIdsWithNotes() -> Set<String> {
+        Set(notes.map(\.airfieldId))
+    }
+
     func add(airfieldId: String, title: String, body: String, category: NoteCategory = .general) {
         let note = PrivateNote(airfieldId: airfieldId, title: title, body: body, category: category)
         notes.append(note)

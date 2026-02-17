@@ -16,6 +16,10 @@ struct Airfield: Identifiable, Codable, Hashable {
     var countryFlag: String?
     /// Region for grouping (e.g. "Europe", "North America").
     var region: String?
+    /// Operating hours (e.g. "24h", "06:00–22:00").
+    var operatingHours: String?
+    /// True if the airfield has night curfew / night flight restrictions; nil if unknown.
+    var hasCurfew: Bool?
 }
 
 struct Runway: Identifiable, Codable, Hashable {

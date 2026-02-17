@@ -8,6 +8,7 @@ import SwiftUI
 enum AirfieldListMode: String, CaseIterable {
     case all = "All"
     case favourites = "Favourites"
+    case myNotes = "My notes"
 }
 
 struct ContentView: View {
@@ -19,6 +20,7 @@ struct ContentView: View {
     @State private var searchText = ""
     @State private var listMode: AirfieldListMode = .all
     @State private var isEditingFavourites = false
+    @State private var expandedNotesAirfieldIds: Set<String> = []
 
     private var airfields: [Airfield] { AirfieldData.allAirfields }
 
@@ -32,15 +34,18 @@ struct ContentView: View {
         }
     }
 
-    /// Airfields to display: either all (filtered) or only favourites (filtered).
+    /// Airfields to display: all, favourites, or only those with at least one of the user's notes.
     private var displayedAirfields: [Airfield] {
         switch listMode {
         case .all: return filteredAirfields
         case .favourites: return filteredAirfields.filter { favouritesStore.isFavourite($0.id) }
+        case .myNotes:
+            let idsWithNotes = privateNotesStore.airfieldIdsWithNotes()
+            return filteredAirfields.filter { idsWithNotes.contains($0.id) }
         }
     }
 
-    /// When editing favourites, show all filtered airfields with tick state. Otherwise show displayed (all or favourites).
+    /// When editing favourites, show all filtered airfields with tick state. Otherwise show displayed list.
     private var listSourceForDisplay: [Airfield] {
         isEditingFavourites ? filteredAirfields : displayedAirfields
     }
@@ -69,6 +74,12 @@ struct ContentView: View {
                             "No favourites",
                             systemImage: "star",
                             description: Text("Tap Edit to select favourite airfields.")
+                        )
+                    } else if listMode == .myNotes && displayedAirfields.isEmpty {
+                        ContentUnavailableView(
+                            "No notes yet",
+                            systemImage: "note.text",
+                            description: Text("Open an airfield and add a note in **My notes** to see it here.")
                         )
                     } else {
                         ForEach(groupedByRegion(listSourceForDisplay), id: \.0) { region, regionAirfields in
@@ -147,6 +158,8 @@ struct ContentView: View {
             .buttonStyle(.plain)
             .listRowBackground(rowBackground)
             .listRowInsets(rowInsets)
+        } else if listMode == .myNotes {
+            myNotesRow(airfield: airfield)
         } else {
             NavigationLink(value: airfield) {
                 AirfieldRowView(airfield: airfield)
@@ -154,6 +167,86 @@ struct ContentView: View {
             .listRowBackground(rowBackground)
             .listRowInsets(rowInsets)
         }
+    }
+
+    /// My notes tab: airfield name (not a link), notes in dropdown for quick access; optional link to full airfield.
+    @ViewBuilder
+    private func myNotesRow(airfield: Airfield) -> some View {
+        let notesAtAirfield = privateNotesStore.notes(for: airfield.id)
+        let isExpanded = expandedNotesAirfieldIds.contains(airfield.id)
+
+        VStack(alignment: .leading, spacing: 0) {
+            // Airfield name only – not a link; just identifies which airfield the notes belong to.
+            HStack {
+                AirfieldRowView(airfield: airfield)
+                Spacer()
+            }
+
+            // Dropdown: tap to expand and see your notes without leaving the list.
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isExpanded { expandedNotesAirfieldIds.remove(airfield.id) }
+                    else { expandedNotesAirfieldIds.insert(airfield.id) }
+                }
+            } label: {
+                HStack {
+                    Image(systemName: "note.text")
+                        .font(.subheadline)
+                        .foregroundStyle(AppTheme.coral)
+                    Text("My notes (\(notesAtAirfield.count))")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(AppTheme.textPrimary)
+                    Spacer()
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(AppTheme.textSecondary)
+                }
+                .padding(.vertical, 8)
+                .padding(.leading, 12)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(notesAtAirfield) { note in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(note.title)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(AppTheme.textPrimary)
+                            if !note.body.isEmpty {
+                                Text(note.body)
+                                    .font(.caption)
+                                    .foregroundStyle(AppTheme.textSecondary)
+                                    .lineLimit(4)
+                            }
+                            Text(note.category.displayName)
+                                .font(.caption2)
+                                .foregroundStyle(AppTheme.coral)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(10)
+                        .background(RoundedRectangle(cornerRadius: 8).fill(AppTheme.coralLight.opacity(0.5)))
+                    }
+                    Button {
+                        selectedAirfield = airfield
+                    } label: {
+                        Label("Open full airfield", systemImage: "arrow.right.circle")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(AppTheme.skyBlue)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.leading, 12)
+                .padding(.trailing, 12)
+                .padding(.bottom, 8)
+            }
+        }
+        .listRowBackground(
+            RoundedRectangle(cornerRadius: AppTheme.bubbleCornerSmall)
+                .fill(Color.white.opacity(0.5))
+        )
+        .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
     }
 }
 

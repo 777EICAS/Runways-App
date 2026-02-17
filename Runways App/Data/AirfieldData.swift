@@ -33,7 +33,9 @@ enum AirfieldData {
             )
         ],
         countryFlag: "🇬🇧",
-        region: "Europe"
+        region: "Europe",
+        operatingHours: "24h",
+        hasCurfew: true
     )
 
     static let lgw: Airfield = Airfield(
@@ -63,7 +65,9 @@ enum AirfieldData {
             )
         ],
         countryFlag: "🇬🇧",
-        region: "Europe"
+        region: "Europe",
+        operatingHours: "24h",
+        hasCurfew: true
     )
 
     static let ewr: Airfield = Airfield(
@@ -102,7 +106,9 @@ enum AirfieldData {
             )
         ],
         countryFlag: "🇺🇸",
-        region: "North America"
+        region: "North America",
+        operatingHours: "24h",
+        hasCurfew: false
     )
 
     static let eham: Airfield = Airfield(
@@ -168,9 +174,66 @@ enum AirfieldData {
             )
         ],
         countryFlag: "🇳🇱",
-        region: "Europe"
+        region: "Europe",
+        operatingHours: "24h",
+        hasCurfew: true
+    )
+
+    static let lfsb: Airfield = Airfield(
+        id: "LFSB",
+        name: "EuroAirport Basel Mulhouse Freiburg",
+        icaoCode: "LFSB",
+        iataCode: "BSL",
+        elevationMeters: 270,
+        runways: [
+            Runway(
+                id: "LFSB-08-26",
+                designation: "08/26",
+                headingDegrees: 80,
+                reciprocalHeadingDegrees: 260,
+                lengthMeters: 1715,
+                widthMeters: 60,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            ),
+            Runway(
+                id: "LFSB-15-33",
+                designation: "15/33",
+                headingDegrees: 150,
+                reciprocalHeadingDegrees: 330,
+                lengthMeters: 3900,
+                widthMeters: 60,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            )
+        ],
+        countryFlag: "🇫🇷",
+        region: "Europe",
+        operatingHours: "24h",
+        hasCurfew: true
+    )
+
+    static let egjj: Airfield = Airfield(
+        id: "EGJJ",
+        name: "Jersey",
+        icaoCode: "EGJJ",
+        iataCode: "JER",
+        elevationMeters: 84,
+        runways: [
+            Runway(
+                id: "EGJJ-08-26",
+                designation: "08/26",
+                headingDegrees: 80,
+                reciprocalHeadingDegrees: 260,
+                lengthMeters: 1706,
+                widthMeters: 45,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            )
+        ],
+        countryFlag: "🇬🇧",
+        region: "Europe",
+        operatingHours: "07:00–21:00",
+        hasCurfew: true
     )
 
     /// All airfields for v1.
-    static var allAirfields: [Airfield] { [lhr, lgw, ewr, eham] }
+    static var allAirfields: [Airfield] { [lhr, lgw, ewr, eham, lfsb, egjj] }
 }
