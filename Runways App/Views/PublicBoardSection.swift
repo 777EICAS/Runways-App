@@ -22,7 +22,7 @@ struct PublicBoardSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                BubblySectionHeader(title: "Pilot board", icon: "bubble.left.and.bubble.right", color: AppTheme.lavender)
+                BubblySectionHeader(title: "💬 Community board", icon: "bubble.left.and.bubble.right", color: AppTheme.lavender)
                 if !isOnline {
                     Text("Offline")
                         .font(.caption.weight(.medium))
@@ -57,7 +57,7 @@ struct PublicBoardSection: View {
             }
 
             if notes.isEmpty && !isComposing {
-                Text("No pilot notes yet. When online, tap **Post** to share your experience.")
+                Text("No community notes yet. When online, tap **Post** to share your experience.")
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.textSecondary)
                     .padding(.vertical, 20)
@@ -71,7 +71,7 @@ struct PublicBoardSection: View {
 
             if isComposing {
                 composeCard
-                    .id("pilotBoardComposeCard")
+                    .id("communityBoardComposeCard")
             }
         }
         .alert("Delete post?", isPresented: Binding(

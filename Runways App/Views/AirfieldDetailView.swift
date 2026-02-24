@@ -18,7 +18,14 @@ struct AirfieldDetailView: View {
 
     private enum NotesBoardMode: String, CaseIterable {
         case myNotes = "My notes"
-        case pilotBoard = "Pilot board"
+        case communityBoard = "Community board"
+
+        var segmentTitle: String {
+            switch self {
+            case .myNotes: return "📝 My notes"
+            case .communityBoard: return "💬 Community board"
+            }
+        }
     }
     @State private var notesBoardMode: NotesBoardMode = .myNotes
 
@@ -34,7 +41,7 @@ struct AirfieldDetailView: View {
                             }
                             Picker("Notes or board", selection: $notesBoardMode) {
                                 ForEach(NotesBoardMode.allCases, id: \.self) { mode in
-                                    Text(mode.rawValue).tag(mode)
+                                    Text(mode.segmentTitle).tag(mode)
                                 }
                             }
                             .pickerStyle(.segmented)
@@ -54,7 +61,7 @@ struct AirfieldDetailView: View {
                                         }
                                     }
                                 )
-                            case .pilotBoard:
+                            case .communityBoard:
                                 PublicBoardSection(
                                     airfieldId: airfield.id,
                                     store: publicBoardStore,
@@ -62,7 +69,7 @@ struct AirfieldDetailView: View {
                                     onPostTapped: {
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
                                             withAnimation(.easeOut(duration: 0.25)) {
-                                                proxy.scrollTo("pilotBoardComposeCard", anchor: .center)
+                                                proxy.scrollTo("communityBoardComposeCard", anchor: .center)
                                             }
                                         }
                                     }

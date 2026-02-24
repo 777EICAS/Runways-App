@@ -39,7 +39,7 @@ struct MyNotesSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                BubblySectionHeader(title: "My notes", icon: "note.text", color: AppTheme.coral)
+                BubblySectionHeader(title: "📝 My notes", icon: "note.text", color: AppTheme.coral)
                 Spacer()
                 Button {
                     resetNewNote()
@@ -84,7 +84,7 @@ struct MyNotesSection: View {
         .alert("Saved to my notes", isPresented: $showSavedToBothOfflineMessage) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text("Will post to pilot board when you're back online.")
+            Text("Will post to community board when you're back online.")
         }
     }
 
@@ -134,7 +134,7 @@ struct MyNotesSection: View {
 
     private func noteCard(_ note: PrivateNote) -> some View {
         let isExpanded = expandedNoteIds.contains(note.id)
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 8) {
             Button {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     if expandedNoteIds.contains(note.id) {
@@ -144,19 +144,20 @@ struct MyNotesSection: View {
                     }
                 }
             } label: {
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(note.title)
                                 .font(.headline)
                                 .foregroundStyle(AppTheme.textPrimary)
+                                .lineLimit(2)
                                 .multilineTextAlignment(.leading)
                             if !note.body.isEmpty {
                                 Text(note.body)
                                     .font(.subheadline)
                                     .foregroundStyle(AppTheme.textSecondary)
                                     .multilineTextAlignment(.leading)
-                                    .lineLimit(isExpanded ? nil : 2)
+                                    .lineLimit(isExpanded ? nil : 3)
                             }
                         }
                         Spacer()
@@ -195,15 +196,6 @@ struct MyNotesSection: View {
                     .font(.caption)
                     .foregroundStyle(AppTheme.textTertiary)
                 Spacer()
-                if isExpanded {
-                    Button("Show less") {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            _ = expandedNoteIds.remove(note.id)
-                        }
-                    }
-                    .buttonStyle(.borderless)
-                    .tint(AppTheme.coral)
-                }
                 HStack(spacing: 12) {
                     Button("Edit") {
                         editTitle = note.title
@@ -221,7 +213,7 @@ struct MyNotesSection: View {
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(BubblyCardBackground(color: AppTheme.coral, colorLight: AppTheme.coralLight))
     }
@@ -283,7 +275,7 @@ struct MyNotesSection: View {
                     newTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
                     newBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 )
-                Button("Save & post to pilot board") {
+                Button("Save & post to community board") {
                     saveNote(postToPilotBoard: true)
                 }
                 .buttonStyle(.bordered)

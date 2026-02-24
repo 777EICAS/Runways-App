@@ -1,6 +1,6 @@
 # Runways App
 
-iOS app for pilots: airfield database with private notes and a shared pilot board. Built with SwiftUI.
+iOS app for pilots: airfield database with private notes and a shared community board. Built with SwiftUI.
 
 ## Requirements
 
@@ -34,6 +34,6 @@ iOS app for pilots: airfield database with private notes and a shared pilot boar
 - **Runways App/** – Main app target
   - **Models/** – Airfield, Runway, notes
   - **Data/** – LHR data, stores (private/public notes)
-  - **Views/** – UI (list, detail, runway info, notes, pilot board)
+  - **Views/** – UI (list, detail, runway info, notes, community board)
   - **Theme/** – Colors and header styling
   - **Utilities/** – e.g. network monitor

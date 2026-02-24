@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// A post queued to be added to the pilot board when back online.
+/// A post queued to be added to the community board when back online.
 struct PendingPublicPost: Codable {
     var airfieldId: String
     var content: String
@@ -45,7 +45,7 @@ final class PublicBoardStore {
         saveMyPostIds()
     }
 
-    /// Queue a post for the pilot board when offline. Call `processPendingPosts()` when back online.
+    /// Queue a post for the community board when offline. Call `processPendingPosts()` when back online.
     func addPending(airfieldId: String, content: String, category: NoteCategory = .general) {
         let pending = PendingPublicPost(airfieldId: airfieldId, content: content, category: category, createdAt: Date())
         pendingPosts.append(pending)
