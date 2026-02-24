@@ -234,6 +234,98 @@ enum AirfieldData {
         hasCurfew: true
     )
 
+    static let egph: Airfield = Airfield(
+        id: "EGPH",
+        name: "Edinburgh",
+        icaoCode: "EGPH",
+        iataCode: "EDI",
+        elevationMeters: 41,
+        runways: [
+            Runway(
+                id: "EGPH-06-24",
+                designation: "06/24",
+                headingDegrees: 60,
+                reciprocalHeadingDegrees: 240,
+                lengthMeters: 2551,
+                widthMeters: 46,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            )
+        ],
+        countryFlag: "🇬🇧",
+        region: "Europe",
+        operatingHours: "24h",
+        hasCurfew: true
+    )
+
+    static let liml: Airfield = Airfield(
+        id: "LIML",
+        name: "Milan Linate",
+        icaoCode: "LIML",
+        iataCode: "LIN",
+        elevationMeters: 108,
+        runways: [
+            Runway(
+                id: "LIML-18-36",
+                designation: "18/36",
+                headingDegrees: 180,
+                reciprocalHeadingDegrees: 360,
+                lengthMeters: 2441,
+                widthMeters: 60,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            )
+        ],
+        countryFlag: "🇮🇹",
+        region: "Europe",
+        operatingHours: "24h",
+        hasCurfew: true
+    )
+
+    static let lsgg: Airfield = Airfield(
+        id: "LSGG",
+        name: "Geneva",
+        icaoCode: "LSGG",
+        iataCode: "GVA",
+        elevationMeters: 430,
+        runways: [
+            Runway(
+                id: "LSGG-04-22",
+                designation: "04/22",
+                headingDegrees: 40,
+                reciprocalHeadingDegrees: 220,
+                lengthMeters: 3903,
+                widthMeters: 50,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            )
+        ],
+        countryFlag: "🇨🇭",
+        region: "Europe",
+        operatingHours: "24h",
+        hasCurfew: true
+    )
+
+    static let fimp: Airfield = Airfield(
+        id: "FIMP",
+        name: "Sir Seewoosagur Ramgoolam International",
+        icaoCode: "FIMP",
+        iataCode: "MRU",
+        elevationMeters: 56,
+        runways: [
+            Runway(
+                id: "FIMP-14-32",
+                designation: "14/32",
+                headingDegrees: 117,
+                reciprocalHeadingDegrees: 297,
+                lengthMeters: 3370,
+                widthMeters: 45,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            )
+        ],
+        countryFlag: "🇲🇺",
+        region: "Africa",
+        operatingHours: "24h",
+        hasCurfew: false
+    )
+
     /// All airfields for v1.
-    static var allAirfields: [Airfield] { [lhr, lgw, ewr, eham, lfsb, egjj] }
+    static var allAirfields: [Airfield] { [lhr, lgw, ewr, eham, lfsb, egjj, egph, liml, lsgg, fimp] }
 }
