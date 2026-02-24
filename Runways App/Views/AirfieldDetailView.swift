@@ -16,6 +16,12 @@ struct AirfieldDetailView: View {
     private let contentPadding: CGFloat = 14
     @State private var isRunwaysExpanded: Bool = false
 
+    private enum NotesBoardMode: String, CaseIterable {
+        case myNotes = "My notes"
+        case pilotBoard = "Pilot board"
+    }
+    @State private var notesBoardMode: NotesBoardMode = .myNotes
+
     var body: some View {
         GeometryReader { geometry in
             ScrollViewReader { proxy in
@@ -26,31 +32,42 @@ struct AirfieldDetailView: View {
                             if isRunwaysExpanded {
                                 RunwayInfoSection(airfield: airfield)
                             }
-                            MyNotesSection(
-                                airfieldId: airfield.id,
-                                store: privateNotesStore,
-                                publicBoardStore: publicBoardStore,
-                                isOnline: isOnline,
-                                onAddNoteTapped: {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                                        withAnimation(.easeOut(duration: 0.25)) {
-                                            proxy.scrollTo("addNoteCard", anchor: .center)
+                            Picker("Notes or board", selection: $notesBoardMode) {
+                                ForEach(NotesBoardMode.allCases, id: \.self) { mode in
+                                    Text(mode.rawValue).tag(mode)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+
+                            switch notesBoardMode {
+                            case .myNotes:
+                                MyNotesSection(
+                                    airfieldId: airfield.id,
+                                    store: privateNotesStore,
+                                    publicBoardStore: publicBoardStore,
+                                    isOnline: isOnline,
+                                    onAddNoteTapped: {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                                            withAnimation(.easeOut(duration: 0.25)) {
+                                                proxy.scrollTo("addNoteCard", anchor: .center)
+                                            }
                                         }
                                     }
-                                }
-                            )
-                            PublicBoardSection(
-                                airfieldId: airfield.id,
-                                store: publicBoardStore,
-                                isOnline: isOnline,
-                                onPostTapped: {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                                        withAnimation(.easeOut(duration: 0.25)) {
-                                            proxy.scrollTo("pilotBoardComposeCard", anchor: .center)
+                                )
+                            case .pilotBoard:
+                                PublicBoardSection(
+                                    airfieldId: airfield.id,
+                                    store: publicBoardStore,
+                                    isOnline: isOnline,
+                                    onPostTapped: {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                                            withAnimation(.easeOut(duration: 0.25)) {
+                                                proxy.scrollTo("pilotBoardComposeCard", anchor: .center)
+                                            }
                                         }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
                         .padding(contentPadding)
                     }
