@@ -37,9 +37,6 @@ struct AirfieldRowView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(AppTheme.skyBlue.opacity(0.7))
         }
         .padding(.vertical, 6)
         .contentShape(Rectangle())

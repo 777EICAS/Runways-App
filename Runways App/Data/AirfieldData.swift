@@ -336,6 +336,48 @@ enum AirfieldData {
         searchableLocation: "Mauritius Plaisance Curepipe"
     )
 
+    static let wsss: Airfield = Airfield(
+        id: "WSSS",
+        name: "Singapore Changi",
+        icaoCode: "WSSS",
+        iataCode: "SIN",
+        elevationMeters: 7,
+        runways: [
+            Runway(
+                id: "WSSS-02L-20R",
+                designation: "02L/20R",
+                headingDegrees: 20,
+                reciprocalHeadingDegrees: 200,
+                lengthMeters: 4000,
+                widthMeters: 60,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            ),
+            Runway(
+                id: "WSSS-02C-20C",
+                designation: "02C/20C",
+                headingDegrees: 20,
+                reciprocalHeadingDegrees: 200,
+                lengthMeters: 4000,
+                widthMeters: 60,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            ),
+            Runway(
+                id: "WSSS-02R-20L",
+                designation: "02R/20L",
+                headingDegrees: 20,
+                reciprocalHeadingDegrees: 200,
+                lengthMeters: 2750,
+                widthMeters: 60,
+                approachTypes: ["ILS", "RNP", "VOR"]
+            )
+        ],
+        countryFlag: "🇸🇬",
+        region: "Asia",
+        operatingHours: "24h",
+        hasCurfew: false,
+        searchableLocation: "Singapore"
+    )
+
     /// All airfields for v1.
-    static var allAirfields: [Airfield] { [lhr, lgw, ewr, eham, lfsb, egjj, egph, liml, lsgg, fimp] }
+    static var allAirfields: [Airfield] { [lhr, lgw, ewr, eham, lfsb, egjj, egph, liml, lsgg, fimp, wsss] }
 }

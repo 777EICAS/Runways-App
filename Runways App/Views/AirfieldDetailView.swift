@@ -12,8 +12,12 @@ struct AirfieldDetailView: View {
     let favouritesStore: FavouritesStore
     let isOnline: Bool
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     private let contentSectionSpacing: CGFloat = 14
     private let contentPadding: CGFloat = 14
+    /// On iPad: use this share of the pane width (capped at max), so content scales with screen and doesn’t leave big empty margins.
+    private let iPadContentWidthFraction: CGFloat = 0.9
+    private let iPadContentMaxWidthCap: CGFloat = 1000
     @State private var isRunwaysExpanded: Bool = false
 
     private enum NotesBoardMode: String, CaseIterable {
@@ -78,6 +82,8 @@ struct AirfieldDetailView: View {
                         }
                         .padding(contentPadding)
                     }
+                    .frame(maxWidth: horizontalSizeClass == .regular ? min(geometry.size.width * iPadContentWidthFraction, iPadContentMaxWidthCap) : nil)
+                    .frame(maxWidth: .infinity)
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .scrollIndicators(.visible)
@@ -118,9 +124,12 @@ struct AirfieldDetailView: View {
                         .foregroundStyle(AppTheme.textPrimary)
                         .lineLimit(2)
                     Spacer()
-                    Image(systemName: "chevron.compact.down")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(AppTheme.textSecondary)
+                    Text("Runways (\(airfield.runways.count))")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(AppTheme.skyBlue)
+                    Image(systemName: isRunwaysExpanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(AppTheme.skyBlue)
                 }
                 .contentShape(Rectangle())
             }
@@ -151,6 +160,7 @@ struct AirfieldDetailView: View {
             }
             .padding(.vertical, 2)
         }
+        .scrollIndicators(.hidden)
     }
 
     private func codePill(label: String, value: String) -> some View {

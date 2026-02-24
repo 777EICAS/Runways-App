@@ -111,6 +111,7 @@ struct ContentView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .background(SkySunsetBackground())
+            .navigationSplitViewColumnWidth(min: 320, ideal: 360)
         } detail: {
             Group {
                 if let airfield = selectedAirfield {
