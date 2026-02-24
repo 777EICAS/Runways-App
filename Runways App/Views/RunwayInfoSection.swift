@@ -105,19 +105,24 @@ struct RunwayInfoSection: View {
 /// Small depiction of a runway with centreline, oriented in the direction of the runway heading (aviation: 0° = North, 90° = East).
 struct RunwayDirectionView: View {
     let headingDegrees: Int
+    @Environment(\.colorScheme) private var colorScheme
     private let length: CGFloat = 30
     private let width: CGFloat = 7
-    private static let runwayDark = Color(white: 0.22)
-    private static let centrelineColor = Color.white.opacity(0.85)
+
+    private var runwayFill: Color {
+        colorScheme == .dark ? Color(white: 0.45) : Color(white: 0.22)
+    }
+    private var centrelineColor: Color {
+        colorScheme == .dark ? Color(white: 0.85) : Color.white.opacity(0.85)
+    }
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: width / 2)
-                .fill(Self.runwayDark)
+                .fill(runwayFill)
                 .frame(width: length, height: width)
-            // Centreline
             RoundedRectangle(cornerRadius: 1)
-                .fill(Self.centrelineColor)
+                .fill(centrelineColor)
                 .frame(width: length - 4, height: 1.5)
         }
         .rotationEffect(.degrees(Double(headingDegrees) - 90))

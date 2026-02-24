@@ -13,14 +13,16 @@ struct PrivateNote: Identifiable, Codable {
     var category: NoteCategory
     var createdAt: Date
     var updatedAt: Date
+    /// Filename of attached image in the store’s note-images directory (e.g. "{id}.jpg").
+    var imageFileName: String?
 
     /// For migration: old notes had `content` only. We derive title from first line and use General.
     enum CodingKeys: String, CodingKey {
-        case id, airfieldId, title, body, category, createdAt, updatedAt
+        case id, airfieldId, title, body, category, createdAt, updatedAt, imageFileName
         case content // legacy
     }
 
-    init(id: UUID = UUID(), airfieldId: String, title: String, body: String, category: NoteCategory = .general, createdAt: Date = Date(), updatedAt: Date = Date()) {
+    init(id: UUID = UUID(), airfieldId: String, title: String, body: String, category: NoteCategory = .general, createdAt: Date = Date(), updatedAt: Date = Date(), imageFileName: String? = nil) {
         self.id = id
         self.airfieldId = airfieldId
         self.title = title
@@ -28,6 +30,7 @@ struct PrivateNote: Identifiable, Codable {
         self.category = category
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.imageFileName = imageFileName
     }
 
     init(from decoder: Decoder) throws {
@@ -36,6 +39,7 @@ struct PrivateNote: Identifiable, Codable {
         airfieldId = try c.decode(String.self, forKey: .airfieldId)
         createdAt = try c.decode(Date.self, forKey: .createdAt)
         updatedAt = try c.decode(Date.self, forKey: .updatedAt)
+        imageFileName = try c.decodeIfPresent(String.self, forKey: .imageFileName)
 
         if let t = try c.decodeIfPresent(String.self, forKey: .title),
            let b = try c.decodeIfPresent(String.self, forKey: .body) {
@@ -75,5 +79,6 @@ struct PrivateNote: Identifiable, Codable {
         try c.encode(category, forKey: .category)
         try c.encode(createdAt, forKey: .createdAt)
         try c.encode(updatedAt, forKey: .updatedAt)
+        try c.encodeIfPresent(imageFileName, forKey: .imageFileName)
     }
 }

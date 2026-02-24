@@ -9,10 +9,13 @@ struct PublicBoardSection: View {
     let airfieldId: String
     @Bindable var store: PublicBoardStore
     let isOnline: Bool
+    var onPostTapped: (() -> Void)? = nil
     @State private var isComposing = false
     @State private var newNoteText = ""
     @State private var selectedCategory: NoteCategory? = nil
     @State private var newNoteCategory: NoteCategory = .general
+    @State private var noteToDelete: PublicNote?
+    @FocusState private var isComposeFocused: Bool
 
     private var notes: [PublicNote] { store.notes(for: airfieldId, category: selectedCategory) }
 
@@ -26,13 +29,17 @@ struct PublicBoardSection: View {
                         .foregroundStyle(AppTheme.textPrimary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(Capsule().fill(AppTheme.lavenderLight))
+                        .background(Capsule().fill(AppTheme.chipFillUnselected))
                 }
                 Spacer()
                 Button {
                     newNoteText = ""
                     newNoteCategory = .general
                     isComposing = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        isComposeFocused = true
+                    }
+                    onPostTapped?()
                 } label: {
                     Label("Post", systemImage: "square.and.pencil")
                 }
@@ -64,7 +71,24 @@ struct PublicBoardSection: View {
 
             if isComposing {
                 composeCard
+                    .id("pilotBoardComposeCard")
             }
+        }
+        .alert("Delete post?", isPresented: Binding(
+            get: { noteToDelete != nil },
+            set: { if !$0 { noteToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) {
+                noteToDelete = nil
+            }
+            Button("Delete", role: .destructive) {
+                if let note = noteToDelete {
+                    store.delete(noteId: note.id)
+                }
+                noteToDelete = nil
+            }
+        } message: {
+            Text("This cannot be undone.")
         }
     }
 
@@ -93,7 +117,7 @@ struct PublicBoardSection: View {
                 .padding(.vertical, 8)
                 .background(
                     Capsule()
-                        .fill(isSelected ? AppTheme.lavender : Color(white: 0.92))
+                        .fill(isSelected ? AppTheme.lavender : AppTheme.chipFillUnselected)
                 )
         }
         .buttonStyle(.plain)
@@ -114,10 +138,22 @@ struct PublicBoardSection: View {
                     .foregroundStyle(AppTheme.textSecondary)
                 Spacer()
                 HStack(spacing: 16) {
-                    thumbsButton(noteId: note.id, vote: .up, count: note.thumbsUp)
-                    thumbsButton(noteId: note.id, vote: .down, count: note.thumbsDown)
+                    HStack(spacing: 16) {
+                        thumbsButton(noteId: note.id, vote: .up, count: note.thumbsUp)
+                        thumbsButton(noteId: note.id, vote: .down, count: note.thumbsDown)
+                    }
+                    .disabled(!isOnline)
+                    if store.canDelete(noteId: note.id) {
+                        Button {
+                            noteToDelete = note
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.caption)
+                                .foregroundStyle(AppTheme.textSecondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .disabled(!isOnline)
             }
         }
         .padding(AppTheme.cardPadding)
@@ -135,7 +171,7 @@ struct PublicBoardSection: View {
         .foregroundStyle(AppTheme.lavender)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(Capsule().fill(AppTheme.lavenderLight.opacity(0.8)))
+        .background(Capsule().fill(AppTheme.chipFillUnselected))
     }
 
     private func thumbsButton(noteId: UUID, vote: PublicNoteVote.VoteType, count: Int) -> some View {
@@ -163,6 +199,7 @@ struct PublicBoardSection: View {
             TextField("Share something useful for other pilots…", text: $newNoteText, axis: .vertical)
                 .lineLimit(3...8)
                 .textFieldStyle(.roundedBorder)
+                .focused($isComposeFocused)
             HStack(spacing: 8) {
                 Text("Category")
                     .font(.subheadline.weight(.medium))

@@ -5,12 +5,24 @@
 
 import Foundation
 
+/// A post queued to be added to the pilot board when back online.
+struct PendingPublicPost: Codable {
+    var airfieldId: String
+    var content: String
+    var category: NoteCategory
+    var createdAt: Date
+}
+
 @Observable
 final class PublicBoardStore {
     private(set) var notes: [PublicNote] = []
     private var votes: [UUID: PublicNoteVote.VoteType] = [:]
+    private(set) var pendingPosts: [PendingPublicPost] = []
+    private var myPostIds: Set<UUID> = []
     private let notesKey = "RunwaysApp.PublicNotes"
     private let votesKey = "RunwaysApp.PublicNoteVotes"
+    private let pendingKey = "RunwaysApp.PendingPublicPosts"
+    private let myPostIdsKey = "RunwaysApp.MyPublicNoteIds"
     private let fileManager = FileManager.default
 
     init() {
@@ -28,7 +40,33 @@ final class PublicBoardStore {
     func add(airfieldId: String, content: String, category: NoteCategory = .general) {
         let note = PublicNote(airfieldId: airfieldId, content: content, category: category)
         notes.append(note)
+        myPostIds.insert(note.id)
         save()
+        saveMyPostIds()
+    }
+
+    /// Queue a post for the pilot board when offline. Call `processPendingPosts()` when back online.
+    func addPending(airfieldId: String, content: String, category: NoteCategory = .general) {
+        let pending = PendingPublicPost(airfieldId: airfieldId, content: content, category: category, createdAt: Date())
+        pendingPosts.append(pending)
+        savePending()
+    }
+
+    /// Process all pending posts into the public board. Call when app is online.
+    func processPendingPosts() {
+        guard !pendingPosts.isEmpty else { return }
+        for pending in pendingPosts {
+            add(airfieldId: pending.airfieldId, content: pending.content, category: pending.category)
+        }
+        pendingPosts.removeAll()
+        savePending()
+    }
+
+    private func savePending() {
+        guard let base = documentsURL else { return }
+        do {
+            try JSONEncoder().encode(pendingPosts).write(to: base.appending(path: "pending_public_posts.json"))
+        } catch { }
     }
 
     func vote(noteId: UUID, vote: PublicNoteVote.VoteType) {
@@ -55,6 +93,21 @@ final class PublicBoardStore {
         votes[noteId]
     }
 
+    /// Whether the current user (this device) is allowed to delete this note (they created it).
+    func canDelete(noteId: UUID) -> Bool {
+        myPostIds.contains(noteId)
+    }
+
+    /// Delete a note. Only succeeds if `canDelete(noteId)` is true.
+    func delete(noteId: UUID) {
+        guard myPostIds.contains(noteId) else { return }
+        notes.removeAll { $0.id == noteId }
+        votes.removeValue(forKey: noteId)
+        myPostIds.remove(noteId)
+        save()
+        saveMyPostIds()
+    }
+
     private var documentsURL: URL? {
         fileManager.urls(for: .documentDirectory, in: .userDomainMask).first
     }
@@ -79,6 +132,32 @@ final class PublicBoardStore {
                 votes = [:]
             }
         }
+        if let url = documentsURL?.appending(path: "pending_public_posts.json"),
+           fileManager.fileExists(atPath: url.path()) {
+            do {
+                let data = try Data(contentsOf: url)
+                pendingPosts = try JSONDecoder().decode([PendingPublicPost].self, from: data)
+            } catch {
+                pendingPosts = []
+            }
+        }
+        if let url = documentsURL?.appending(path: "my_public_note_ids.json"),
+           fileManager.fileExists(atPath: url.path()) {
+            do {
+                let data = try Data(contentsOf: url)
+                let uuids = try JSONDecoder().decode([UUID].self, from: data)
+                myPostIds = Set(uuids)
+            } catch {
+                myPostIds = []
+            }
+        }
+    }
+
+    private func saveMyPostIds() {
+        guard let base = documentsURL else { return }
+        do {
+            try JSONEncoder().encode(Array(myPostIds)).write(to: base.appending(path: "my_public_note_ids.json"))
+        } catch { }
     }
 
     private func save() {

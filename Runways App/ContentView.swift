@@ -60,12 +60,21 @@ struct ContentView: View {
         NavigationSplitView {
             VStack(spacing: 0) {
                 AppHeaderView()
-                Picker("List", selection: $listMode) {
-                    ForEach(AirfieldListMode.allCases, id: \.self) { mode in
-                        Text(mode.rawValue).tag(mode)
+                HStack(spacing: 12) {
+                    Picker("List", selection: $listMode) {
+                        ForEach(AirfieldListMode.allCases, id: \.self) { mode in
+                            Text(mode.rawValue).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    if listMode == .favourites {
+                        Button(isEditingFavourites ? "Done" : "Edit") {
+                            isEditingFavourites.toggle()
+                        }
+                        .font(.subheadline.weight(.medium))
+                        .tint(AppTheme.skyBlue)
                     }
                 }
-                .pickerStyle(.segmented)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 List(selection: $selectedAirfield) {
@@ -99,17 +108,7 @@ struct ContentView: View {
                 .scrollContentBackground(.hidden)
                 .searchable(text: $searchText, prompt: "Search by name, IATA or ICAO")
             }
-            .navigationTitle("Airfields")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                if listMode == .favourites {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button(isEditingFavourites ? "Done" : "Edit") {
-                            isEditingFavourites.toggle()
-                        }
-                    }
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .background(SkySunsetBackground())
         } detail: {
             Group {
@@ -119,6 +118,7 @@ struct ContentView: View {
                             airfield: airfield,
                             privateNotesStore: privateNotesStore,
                             publicBoardStore: publicBoardStore,
+                            favouritesStore: favouritesStore,
                             isOnline: networkMonitor.isConnected
                         )
                     }
@@ -136,12 +136,22 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .tint(AppTheme.skyBlue)
+        .onChange(of: networkMonitor.isConnected) { _, isConnected in
+            if isConnected {
+                publicBoardStore.processPendingPosts()
+            }
+        }
+        .onAppear {
+            if networkMonitor.isConnected {
+                publicBoardStore.processPendingPosts()
+            }
+        }
     }
 
     @ViewBuilder
     private func row(for airfield: Airfield, region: String) -> some View {
         let rowBackground = RoundedRectangle(cornerRadius: AppTheme.bubbleCornerSmall)
-            .fill(Color.white.opacity(0.5))
+            .fill(AppTheme.cardFill)
         let rowInsets = EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12)
 
         if isEditingFavourites {
@@ -226,7 +236,7 @@ struct ContentView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(10)
-                        .background(RoundedRectangle(cornerRadius: 8).fill(AppTheme.coralLight.opacity(0.5)))
+                        .background(RoundedRectangle(cornerRadius: 8).fill(AppTheme.cardFill))
                     }
                     Button {
                         selectedAirfield = airfield
@@ -244,7 +254,7 @@ struct ContentView: View {
         }
         .listRowBackground(
             RoundedRectangle(cornerRadius: AppTheme.bubbleCornerSmall)
-                .fill(Color.white.opacity(0.5))
+                .fill(AppTheme.cardFill)
         )
         .listRowInsets(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
     }

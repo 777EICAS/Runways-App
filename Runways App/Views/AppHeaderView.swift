@@ -18,7 +18,7 @@ struct AppHeaderView: View {
                 .foregroundStyle(AppTheme.headerBlue)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
+        .padding(.vertical, 12)
     }
 }
 

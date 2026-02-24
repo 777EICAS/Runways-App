@@ -9,6 +9,7 @@ struct AirfieldDetailView: View {
     let airfield: Airfield
     let privateNotesStore: PrivateNotesStore
     let publicBoardStore: PublicBoardStore
+    let favouritesStore: FavouritesStore
     let isOnline: Bool
 
     private let contentSectionSpacing: CGFloat = 14
@@ -16,19 +17,44 @@ struct AirfieldDetailView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            ScrollView {
-                VStack(spacing: 0) {
-                    airfieldHeader
-                    VStack(alignment: .leading, spacing: contentSectionSpacing) {
-                        RunwayInfoSection(airfield: airfield)
-                        MyNotesSection(airfieldId: airfield.id, store: privateNotesStore)
-                        PublicBoardSection(airfieldId: airfield.id, store: publicBoardStore, isOnline: isOnline)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        airfieldHeader
+                        VStack(alignment: .leading, spacing: contentSectionSpacing) {
+                            RunwayInfoSection(airfield: airfield)
+                            MyNotesSection(
+                                airfieldId: airfield.id,
+                                store: privateNotesStore,
+                                publicBoardStore: publicBoardStore,
+                                isOnline: isOnline,
+                                onAddNoteTapped: {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                                        withAnimation(.easeOut(duration: 0.25)) {
+                                            proxy.scrollTo("addNoteCard", anchor: .center)
+                                        }
+                                    }
+                                }
+                            )
+                            PublicBoardSection(
+                                airfieldId: airfield.id,
+                                store: publicBoardStore,
+                                isOnline: isOnline,
+                                onPostTapped: {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                                        withAnimation(.easeOut(duration: 0.25)) {
+                                            proxy.scrollTo("pilotBoardComposeCard", anchor: .center)
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                        .padding(contentPadding)
                     }
-                    .padding(contentPadding)
                 }
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .scrollIndicators(.visible)
             }
-            .frame(width: geometry.size.width, height: geometry.size.height)
-            .scrollIndicators(.visible)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(SkySunsetBackground())
@@ -36,6 +62,15 @@ struct AirfieldDetailView: View {
         // Title is rendered in the header (bigger + codes beside it).
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    favouritesStore.toggle(airfield.id)
+                } label: {
+                    Image(systemName: favouritesStore.isFavourite(airfield.id) ? "heart.fill" : "heart")
+                }
+            }
+        }
     }
 
     /// Compact header: flag inline with title + pills, pulled up toward nav bar.
@@ -101,11 +136,11 @@ struct AirfieldDetailView: View {
         .padding(.vertical, 6)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.55))
+                .fill(AppTheme.cardFill)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                .stroke(AppTheme.cardStroke, lineWidth: 1)
         )
     }
 
@@ -123,11 +158,11 @@ struct AirfieldDetailView: View {
         .padding(.vertical, 6)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.55))
+                .fill(AppTheme.cardFill)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                .stroke(AppTheme.cardStroke, lineWidth: 1)
         )
     }
 }
@@ -138,6 +173,7 @@ struct AirfieldDetailView: View {
             airfield: AirfieldData.lhr,
             privateNotesStore: PrivateNotesStore(),
             publicBoardStore: PublicBoardStore(),
+            favouritesStore: FavouritesStore(),
             isOnline: true
         )
     }
