@@ -37,7 +37,7 @@ struct MyNotesSection: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack {
                 BubblySectionHeader(title: "My notes", icon: "note.text", color: AppTheme.coral)
                 Spacer()
@@ -55,7 +55,7 @@ struct MyNotesSection: View {
                 .tint(AppTheme.coral)
             }
 
-            categoryFilter
+            categoryTabs
 
             if notes.isEmpty && !isAdding {
                 emptyState
@@ -88,33 +88,37 @@ struct MyNotesSection: View {
         }
     }
 
-    private var categoryFilter: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                filterChip("All", isSelected: selectedCategory == nil) {
-                    selectedCategory = nil
-                }
-                ForEach(NoteCategory.allCases, id: \.self) { category in
-                    filterChip(category.displayName, isSelected: selectedCategory == category) {
-                        selectedCategory = category
-                    }
+    /// Tabbed-style category selector (All, Taxi, Take off, Approach, General).
+    private var categoryTabs: some View {
+        HStack(spacing: 0) {
+            categoryTab(label: "All", isSelected: selectedCategory == nil) {
+                selectedCategory = nil
+            }
+            ForEach(NoteCategory.allCases, id: \.self) { category in
+                categoryTab(label: category.displayName, isSelected: selectedCategory == category) {
+                    selectedCategory = category
                 }
             }
-            .padding(.vertical, 4)
         }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(AppTheme.cardFill)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(AppTheme.cardStroke, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    private func filterChip(_ label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+    private func categoryTab(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(isSelected ? .white : AppTheme.textPrimary)
-                .padding(.horizontal, 14)
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(isSelected ? AppTheme.coral : AppTheme.chipFillUnselected)
-                )
+                .background(isSelected ? AppTheme.coral : .clear)
+                .foregroundStyle(isSelected ? Color.white : AppTheme.textSecondary)
         }
         .buttonStyle(.plain)
     }
@@ -130,7 +134,7 @@ struct MyNotesSection: View {
 
     private func noteCard(_ note: PrivateNote) -> some View {
         let isExpanded = expandedNoteIds.contains(note.id)
-        return VStack(alignment: .leading, spacing: 12) {
+        return VStack(alignment: .leading, spacing: 10) {
             Button {
                 withAnimation(.easeInOut(duration: 0.25)) {
                     if expandedNoteIds.contains(note.id) {
@@ -216,7 +220,8 @@ struct MyNotesSection: View {
                 }
             }
         }
-        .padding(AppTheme.cardPadding)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(BubblyCardBackground(color: AppTheme.coral, colorLight: AppTheme.coralLight))
     }
@@ -235,7 +240,7 @@ struct MyNotesSection: View {
     }
 
     private var addNoteCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             TextField("Title", text: $newTitle)
                 .textFieldStyle(.roundedBorder)
                 .focused($isTitleFocused)
@@ -289,7 +294,8 @@ struct MyNotesSection: View {
                 )
             }
         }
-        .padding(AppTheme.cardPadding)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .background(BubblyCardBackground(color: AppTheme.coral, colorLight: AppTheme.coralLight))
     }
 

@@ -20,7 +20,7 @@ struct PublicBoardSection: View {
     private var notes: [PublicNote] { store.notes(for: airfieldId, category: selectedCategory) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack {
                 BubblySectionHeader(title: "Pilot board", icon: "bubble.left.and.bubble.right", color: AppTheme.lavender)
                 if !isOnline {
@@ -48,7 +48,7 @@ struct PublicBoardSection: View {
                 .disabled(!isOnline)
             }
 
-            categoryFilter
+            categoryTabs
 
             if !isOnline {
                 Text("Public notes are cached. Posting and voting require an internet connection.")
@@ -92,39 +92,43 @@ struct PublicBoardSection: View {
         }
     }
 
-    private var categoryFilter: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                filterChip("All", isSelected: selectedCategory == nil) {
-                    selectedCategory = nil
-                }
-                ForEach(NoteCategory.allCases, id: \.self) { category in
-                    filterChip(category.displayName, isSelected: selectedCategory == category) {
-                        selectedCategory = category
-                    }
+    /// Tabbed-style category selector mirroring My notes (All, Taxi, Take off, Approach, General).
+    private var categoryTabs: some View {
+        HStack(spacing: 0) {
+            categoryTab(label: "All", isSelected: selectedCategory == nil) {
+                selectedCategory = nil
+            }
+            ForEach(NoteCategory.allCases, id: \.self) { category in
+                categoryTab(label: category.displayName, isSelected: selectedCategory == category) {
+                    selectedCategory = category
                 }
             }
-            .padding(.vertical, 4)
         }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(AppTheme.cardFill)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(AppTheme.cardStroke, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    private func filterChip(_ label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+    private func categoryTab(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(label)
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(isSelected ? .white : AppTheme.textPrimary)
-                .padding(.horizontal, 14)
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(isSelected ? AppTheme.lavender : AppTheme.chipFillUnselected)
-                )
+                .background(isSelected ? AppTheme.lavender : .clear)
+                .foregroundStyle(isSelected ? Color.white : AppTheme.textSecondary)
         }
         .buttonStyle(.plain)
     }
 
     private func publicNoteCard(_ note: PublicNote) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top) {
                 Text(note.content)
                     .font(.body)
@@ -156,7 +160,8 @@ struct PublicBoardSection: View {
                 }
             }
         }
-        .padding(AppTheme.cardPadding)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(BubblyCardBackground(color: AppTheme.lavender, colorLight: AppTheme.lavenderLight))
     }
@@ -195,7 +200,7 @@ struct PublicBoardSection: View {
     }
 
     private var composeCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             TextField("Share something useful for other pilots…", text: $newNoteText, axis: .vertical)
                 .lineLimit(3...8)
                 .textFieldStyle(.roundedBorder)
@@ -233,7 +238,8 @@ struct PublicBoardSection: View {
                 .disabled(newNoteText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
-        .padding(AppTheme.cardPadding)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .background(BubblyCardBackground(color: AppTheme.lavender, colorLight: AppTheme.lavenderLight))
     }
 }
