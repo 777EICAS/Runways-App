@@ -12,6 +12,7 @@ enum AirfieldListMode: String, CaseIterable {
 }
 
 struct ContentView: View {
+    var notificationRouter: NotificationRouter
     @State private var privateNotesStore = PrivateNotesStore()
     @State private var publicBoardStore = PublicBoardStore()
     @State private var networkMonitor = NetworkMonitor()
@@ -148,6 +149,13 @@ struct ContentView: View {
                 publicBoardStore.processPendingPosts()
             }
         }
+        .onChange(of: notificationRouter.pendingAirfieldId) { _, pendingId in
+            guard let id = pendingId else { return }
+            if let airfield = airfields.first(where: { $0.id == id }) {
+                selectedAirfield = airfield
+            }
+            notificationRouter.clearPending()
+        }
     }
 
     @ViewBuilder
@@ -263,5 +271,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(notificationRouter: NotificationRouter())
 }

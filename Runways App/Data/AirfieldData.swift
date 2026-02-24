@@ -36,7 +36,9 @@ enum AirfieldData {
         region: "Europe",
         operatingHours: "24h",
         hasCurfew: true,
-        searchableLocation: "London United Kingdom England"
+        searchableLocation: "London United Kingdom England",
+        latitude: 51.4700,
+        longitude: -0.4543
     )
 
     static let lgw: Airfield = Airfield(
@@ -69,7 +71,9 @@ enum AirfieldData {
         region: "Europe",
         operatingHours: "24h",
         hasCurfew: true,
-        searchableLocation: "London United Kingdom England"
+        searchableLocation: "London United Kingdom England",
+        latitude: 51.1481,
+        longitude: -0.1903
     )
 
     static let ewr: Airfield = Airfield(
@@ -111,7 +115,9 @@ enum AirfieldData {
         region: "North America",
         operatingHours: "24h",
         hasCurfew: false,
-        searchableLocation: "Newark United States America New Jersey"
+        searchableLocation: "Newark United States America New Jersey",
+        latitude: 40.6895,
+        longitude: -74.1745
     )
 
     static let eham: Airfield = Airfield(
@@ -180,7 +186,9 @@ enum AirfieldData {
         region: "Europe",
         operatingHours: "24h",
         hasCurfew: true,
-        searchableLocation: "Amsterdam Netherlands"
+        searchableLocation: "Amsterdam Netherlands",
+        latitude: 52.3105,
+        longitude: 4.7683
     )
 
     static let lfsb: Airfield = Airfield(
@@ -213,7 +221,9 @@ enum AirfieldData {
         region: "Europe",
         operatingHours: "24h",
         hasCurfew: true,
-        searchableLocation: "Basel Mulhouse Freiburg France Switzerland"
+        searchableLocation: "Basel Mulhouse Freiburg France Switzerland",
+        latitude: 47.5900,
+        longitude: 7.5292
     )
 
     static let egjj: Airfield = Airfield(
@@ -237,7 +247,9 @@ enum AirfieldData {
         region: "Europe",
         operatingHours: "07:00–21:00",
         hasCurfew: true,
-        searchableLocation: "Jersey United Kingdom Channel Islands"
+        searchableLocation: "Jersey United Kingdom Channel Islands",
+        latitude: 49.2080,
+        longitude: -2.1955
     )
 
     static let egph: Airfield = Airfield(
@@ -261,7 +273,9 @@ enum AirfieldData {
         region: "Europe",
         operatingHours: "24h",
         hasCurfew: true,
-        searchableLocation: "Edinburgh Scotland United Kingdom"
+        searchableLocation: "Edinburgh Scotland United Kingdom",
+        latitude: 55.9500,
+        longitude: -3.3725
     )
 
     static let liml: Airfield = Airfield(
@@ -285,7 +299,9 @@ enum AirfieldData {
         region: "Europe",
         operatingHours: "24h",
         hasCurfew: true,
-        searchableLocation: "Milan Italy Linate"
+        searchableLocation: "Milan Italy Linate",
+        latitude: 45.4451,
+        longitude: 9.2767
     )
 
     static let lsgg: Airfield = Airfield(
@@ -309,7 +325,9 @@ enum AirfieldData {
         region: "Europe",
         operatingHours: "24h",
         hasCurfew: true,
-        searchableLocation: "Geneva Switzerland"
+        searchableLocation: "Geneva Switzerland",
+        latitude: 46.2383,
+        longitude: 6.1094
     )
 
     static let fimp: Airfield = Airfield(
@@ -333,7 +351,9 @@ enum AirfieldData {
         region: "Africa",
         operatingHours: "24h",
         hasCurfew: false,
-        searchableLocation: "Mauritius Plaisance Curepipe"
+        searchableLocation: "Mauritius Plaisance Curepipe",
+        latitude: -20.4302,
+        longitude: 57.6836
     )
 
     static let wsss: Airfield = Airfield(
@@ -375,7 +395,9 @@ enum AirfieldData {
         region: "Asia",
         operatingHours: "24h",
         hasCurfew: false,
-        searchableLocation: "Singapore"
+        searchableLocation: "Singapore",
+        latitude: 1.3644,
+        longitude: 103.9915
     )
 
     /// All airfields for v1.

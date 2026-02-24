@@ -22,6 +22,10 @@ struct Airfield: Identifiable, Codable, Hashable {
     var hasCurfew: Bool?
     /// Location/country terms used only for search (e.g. "Mauritius", "Scotland"). Not displayed.
     var searchableLocation: String?
+    /// Latitude for location-based note reminders; nil if unknown.
+    var latitude: Double?
+    /// Longitude for location-based note reminders; nil if unknown.
+    var longitude: Double?
 }
 
 struct Runway: Identifiable, Codable, Hashable {
