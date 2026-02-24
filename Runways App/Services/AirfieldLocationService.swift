@@ -14,6 +14,9 @@ final class AirfieldLocationService: NSObject {
     private let locationManager = CLLocationManager()
     private let notificationCenter = UNUserNotificationCenter.current()
 
+    /// When set, notifications are only scheduled if settings.notifyNearAirfield is true.
+    weak var settings: AppSettings?
+
     /// Airfields with coordinates to check against. Defaults to `AirfieldData.allAirfields`.
     var airfields: [Airfield] = AirfieldData.allAirfields
 
@@ -72,6 +75,11 @@ final class AirfieldLocationService: NSObject {
         isMonitoring = false
     }
 
+    /// Current location authorization status for display in settings.
+    var locationAuthorizationStatus: CLAuthorizationStatus {
+        locationManager.authorizationStatus
+    }
+
     private func airfieldsWithCoordinates() -> [Airfield] {
         airfields.filter { $0.latitude != nil && $0.longitude != nil }
     }
@@ -106,6 +114,8 @@ final class AirfieldLocationService: NSObject {
     }
 
     private func scheduleNotification(for airfield: Airfield) {
+        guard let s = settings else { return }
+        guard s.notificationsEnabled && s.notifyNearAirfield else { return }
         let content = UNMutableNotificationContent()
         content.title = "Add your notes"
         content.body = "You're near \(airfield.name) — add your notes for this airfield?"

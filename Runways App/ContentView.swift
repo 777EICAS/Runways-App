@@ -13,6 +13,9 @@ enum AirfieldListMode: String, CaseIterable {
 
 struct ContentView: View {
     var notificationRouter: NotificationRouter
+    @Environment(AppSettings.self) private var appSettings
+    @Environment(AirfieldLocationService.self) private var locationService
+    @State private var showSettings = false
     @State private var privateNotesStore = PrivateNotesStore()
     @State private var publicBoardStore = PublicBoardStore()
     @State private var networkMonitor = NetworkMonitor()
@@ -61,7 +64,7 @@ struct ContentView: View {
     var body: some View {
         NavigationSplitView {
             VStack(spacing: 0) {
-                AppHeaderView()
+                AppHeaderView(onSettingsTap: { showSettings = true })
                 HStack(spacing: 12) {
                     Picker("List", selection: $listMode) {
                         ForEach(AirfieldListMode.allCases, id: \.self) { mode in
@@ -139,6 +142,9 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .tint(AppTheme.skyBlue)
+        .sheet(isPresented: $showSettings) {
+            SettingsView(settings: appSettings, locationService: locationService)
+        }
         .onChange(of: networkMonitor.isConnected) { _, isConnected in
             if isConnected {
                 publicBoardStore.processPendingPosts()
@@ -272,4 +278,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView(notificationRouter: NotificationRouter())
+        .environment(AppSettings())
+        .environment(AirfieldLocationService())
 }
