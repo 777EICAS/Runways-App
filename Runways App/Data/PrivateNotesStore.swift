@@ -30,7 +30,16 @@ final class PrivateNotesStore {
         if let category {
             result = result.filter { $0.category == category }
         }
-        return result.sorted { $0.updatedAt > $1.updatedAt }
+        return result.sorted { n1, n2 in
+            if n1.isPinned != n2.isPinned { return n1.isPinned }
+            return n1.updatedAt > n2.updatedAt
+        }
+    }
+
+    func togglePin(_ note: PrivateNote) {
+        guard let index = notes.firstIndex(where: { $0.id == note.id }) else { return }
+        notes[index].isPinned.toggle()
+        save()
     }
 
     /// Airfield IDs that have at least one note (for "My notes" list filter).

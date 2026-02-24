@@ -11,6 +11,7 @@ struct PrivateNote: Identifiable, Codable {
     var title: String
     var body: String
     var category: NoteCategory
+    var isPinned: Bool
     var createdAt: Date
     var updatedAt: Date
     /// Filename of attached image in the store’s note-images directory (e.g. "{id}.jpg").
@@ -18,16 +19,17 @@ struct PrivateNote: Identifiable, Codable {
 
     /// For migration: old notes had `content` only. We derive title from first line and use General.
     enum CodingKeys: String, CodingKey {
-        case id, airfieldId, title, body, category, createdAt, updatedAt, imageFileName
+        case id, airfieldId, title, body, category, isPinned, createdAt, updatedAt, imageFileName
         case content // legacy
     }
 
-    init(id: UUID = UUID(), airfieldId: String, title: String, body: String, category: NoteCategory = .general, createdAt: Date = Date(), updatedAt: Date = Date(), imageFileName: String? = nil) {
+    init(id: UUID = UUID(), airfieldId: String, title: String, body: String, category: NoteCategory = .general, isPinned: Bool = false, createdAt: Date = Date(), updatedAt: Date = Date(), imageFileName: String? = nil) {
         self.id = id
         self.airfieldId = airfieldId
         self.title = title
         self.body = body
         self.category = category
+        self.isPinned = isPinned
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.imageFileName = imageFileName
@@ -41,6 +43,7 @@ struct PrivateNote: Identifiable, Codable {
         updatedAt = try c.decode(Date.self, forKey: .updatedAt)
         imageFileName = try c.decodeIfPresent(String.self, forKey: .imageFileName)
 
+        isPinned = try c.decodeIfPresent(Bool.self, forKey: .isPinned) ?? false
         if let t = try c.decodeIfPresent(String.self, forKey: .title),
            let b = try c.decodeIfPresent(String.self, forKey: .body) {
             title = t
@@ -77,6 +80,7 @@ struct PrivateNote: Identifiable, Codable {
         try c.encode(title, forKey: .title)
         try c.encode(body, forKey: .body)
         try c.encode(category, forKey: .category)
+        try c.encode(isPinned, forKey: .isPinned)
         try c.encode(createdAt, forKey: .createdAt)
         try c.encode(updatedAt, forKey: .updatedAt)
         try c.encodeIfPresent(imageFileName, forKey: .imageFileName)

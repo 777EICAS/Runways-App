@@ -43,6 +43,7 @@ struct MyNotesSection: View {
                 Spacer()
                 Button {
                     resetNewNote()
+                    newCategory = selectedCategory ?? .general
                     isAdding = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         isTitleFocused = true
@@ -160,6 +161,7 @@ struct MyNotesSection: View {
                                     .lineLimit(isExpanded ? nil : 3)
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         Spacer()
                         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                             .font(.caption.weight(.semibold))
@@ -197,6 +199,15 @@ struct MyNotesSection: View {
                     .foregroundStyle(AppTheme.textTertiary)
                 Spacer()
                 HStack(spacing: 12) {
+                    Button {
+                        store.togglePin(note)
+                    } label: {
+                        Image(systemName: note.isPinned ? "pin.fill" : "pin")
+                            .font(.subheadline)
+                    }
+                    .buttonStyle(.borderless)
+                    .tint(note.isPinned ? AppTheme.coral : AppTheme.textTertiary)
+                    .accessibilityLabel(note.isPinned ? "Unpin note" : "Pin note")
                     Button("Edit") {
                         editTitle = note.title
                         editBody = note.body
