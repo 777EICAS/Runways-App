@@ -14,6 +14,7 @@ struct AirfieldDetailView: View {
 
     private let contentSectionSpacing: CGFloat = 14
     private let contentPadding: CGFloat = 14
+    @State private var isRunwaysExpanded: Bool = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -22,7 +23,9 @@ struct AirfieldDetailView: View {
                     VStack(spacing: 0) {
                         airfieldHeader
                         VStack(alignment: .leading, spacing: contentSectionSpacing) {
-                            RunwayInfoSection(airfield: airfield)
+                            if isRunwaysExpanded {
+                                RunwayInfoSection(airfield: airfield)
+                            }
                             MyNotesSection(
                                 airfieldId: airfield.id,
                                 store: privateNotesStore,
@@ -73,35 +76,38 @@ struct AirfieldDetailView: View {
         }
     }
 
-    /// Compact header: flag inline with title + pills, pulled up toward nav bar.
+    /// Compact header: flag + title row is a dropdown toggle for runways, pill bar stays separate.
     private var airfieldHeader: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                titleWithFlag
-                codesInline
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    isRunwaysExpanded.toggle()
+                }
+            } label: {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    if let flag = airfield.countryFlag {
+                        Text(flag)
+                            .font(.system(size: 24))
+                    }
+                    Text(airfield.name)
+                        .font(.system(size: 26, weight: .bold))
+                        .foregroundStyle(AppTheme.textPrimary)
+                        .lineLimit(2)
+                    Spacer()
+                    Image(systemName: "chevron.compact.down")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(AppTheme.textSecondary)
+                }
+                .contentShape(Rectangle())
             }
-            VStack(alignment: .leading, spacing: 6) {
-                titleWithFlag
-                codesInline
-            }
+            .buttonStyle(.plain)
+
+            codesInline
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.top, 4)
         .padding(.bottom, 8)
-    }
-
-    private var titleWithFlag: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
-            if let flag = airfield.countryFlag {
-                Text(flag)
-                    .font(.system(size: 24))
-            }
-            Text(airfield.name)
-                .font(.system(size: 26, weight: .bold))
-                .foregroundStyle(AppTheme.textPrimary)
-                .lineLimit(2)
-        }
     }
 
     private var codesInline: some View {
