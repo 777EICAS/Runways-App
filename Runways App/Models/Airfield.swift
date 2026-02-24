@@ -20,6 +20,8 @@ struct Airfield: Identifiable, Codable, Hashable {
     var operatingHours: String?
     /// True if the airfield has night curfew / night flight restrictions; nil if unknown.
     var hasCurfew: Bool?
+    /// Location/country terms used only for search (e.g. "Mauritius", "Scotland"). Not displayed.
+    var searchableLocation: String?
 }
 
 struct Runway: Identifiable, Codable, Hashable {

@@ -30,7 +30,8 @@ struct ContentView: View {
         return airfields.filter {
             $0.name.lowercased().contains(query) ||
             $0.icaoCode.lowercased().contains(query) ||
-            ($0.iataCode?.lowercased().contains(query) ?? false)
+            ($0.iataCode?.lowercased().contains(query) ?? false) ||
+            ($0.searchableLocation?.lowercased().contains(query) ?? false)
         }
     }
 

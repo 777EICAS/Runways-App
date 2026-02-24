@@ -35,7 +35,8 @@ enum AirfieldData {
         countryFlag: "🇬🇧",
         region: "Europe",
         operatingHours: "24h",
-        hasCurfew: true
+        hasCurfew: true,
+        searchableLocation: "London United Kingdom England"
     )
 
     static let lgw: Airfield = Airfield(
@@ -67,7 +68,8 @@ enum AirfieldData {
         countryFlag: "🇬🇧",
         region: "Europe",
         operatingHours: "24h",
-        hasCurfew: true
+        hasCurfew: true,
+        searchableLocation: "London United Kingdom England"
     )
 
     static let ewr: Airfield = Airfield(
@@ -108,7 +110,8 @@ enum AirfieldData {
         countryFlag: "🇺🇸",
         region: "North America",
         operatingHours: "24h",
-        hasCurfew: false
+        hasCurfew: false,
+        searchableLocation: "Newark United States America New Jersey"
     )
 
     static let eham: Airfield = Airfield(
@@ -176,7 +179,8 @@ enum AirfieldData {
         countryFlag: "🇳🇱",
         region: "Europe",
         operatingHours: "24h",
-        hasCurfew: true
+        hasCurfew: true,
+        searchableLocation: "Amsterdam Netherlands"
     )
 
     static let lfsb: Airfield = Airfield(
@@ -208,7 +212,8 @@ enum AirfieldData {
         countryFlag: "🇫🇷",
         region: "Europe",
         operatingHours: "24h",
-        hasCurfew: true
+        hasCurfew: true,
+        searchableLocation: "Basel Mulhouse Freiburg France Switzerland"
     )
 
     static let egjj: Airfield = Airfield(
@@ -231,7 +236,8 @@ enum AirfieldData {
         countryFlag: "🇬🇧",
         region: "Europe",
         operatingHours: "07:00–21:00",
-        hasCurfew: true
+        hasCurfew: true,
+        searchableLocation: "Jersey United Kingdom Channel Islands"
     )
 
     static let egph: Airfield = Airfield(
@@ -254,7 +260,8 @@ enum AirfieldData {
         countryFlag: "🇬🇧",
         region: "Europe",
         operatingHours: "24h",
-        hasCurfew: true
+        hasCurfew: true,
+        searchableLocation: "Edinburgh Scotland United Kingdom"
     )
 
     static let liml: Airfield = Airfield(
@@ -277,7 +284,8 @@ enum AirfieldData {
         countryFlag: "🇮🇹",
         region: "Europe",
         operatingHours: "24h",
-        hasCurfew: true
+        hasCurfew: true,
+        searchableLocation: "Milan Italy Linate"
     )
 
     static let lsgg: Airfield = Airfield(
@@ -300,7 +308,8 @@ enum AirfieldData {
         countryFlag: "🇨🇭",
         region: "Europe",
         operatingHours: "24h",
-        hasCurfew: true
+        hasCurfew: true,
+        searchableLocation: "Geneva Switzerland"
     )
 
     static let fimp: Airfield = Airfield(
@@ -323,7 +332,8 @@ enum AirfieldData {
         countryFlag: "🇲🇺",
         region: "Africa",
         operatingHours: "24h",
-        hasCurfew: false
+        hasCurfew: false,
+        searchableLocation: "Mauritius Plaisance Curepipe"
     )
 
     /// All airfields for v1.
