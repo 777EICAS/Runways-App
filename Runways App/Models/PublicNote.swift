@@ -8,6 +8,8 @@ import Foundation
 struct PublicNote: Identifiable, Codable {
     var id: UUID
     var airfieldId: String
+    var authorId: UUID?
+    var authorDisplayName: String?
     var content: String
     var category: NoteCategory
     var createdAt: Date
@@ -15,9 +17,11 @@ struct PublicNote: Identifiable, Codable {
     var thumbsUp: Int
     var thumbsDown: Int
 
-    init(id: UUID = UUID(), airfieldId: String, content: String, category: NoteCategory = .general, createdAt: Date = Date(), updatedAt: Date = Date(), thumbsUp: Int = 0, thumbsDown: Int = 0) {
+    init(id: UUID = UUID(), airfieldId: String, authorId: UUID? = nil, authorDisplayName: String? = nil, content: String, category: NoteCategory = .general, createdAt: Date = Date(), updatedAt: Date = Date(), thumbsUp: Int = 0, thumbsDown: Int = 0) {
         self.id = id
         self.airfieldId = airfieldId
+        self.authorId = authorId
+        self.authorDisplayName = authorDisplayName
         self.content = content
         self.category = category
         self.createdAt = createdAt
@@ -30,6 +34,8 @@ struct PublicNote: Identifiable, Codable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(UUID.self, forKey: .id)
         airfieldId = try c.decode(String.self, forKey: .airfieldId)
+        authorId = try c.decodeIfPresent(UUID.self, forKey: .authorId)
+        authorDisplayName = try c.decodeIfPresent(String.self, forKey: .authorDisplayName)
         content = try c.decode(String.self, forKey: .content)
         category = try c.decodeIfPresent(NoteCategory.self, forKey: .category) ?? .general
         createdAt = try c.decode(Date.self, forKey: .createdAt)
@@ -42,6 +48,8 @@ struct PublicNote: Identifiable, Codable {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(id, forKey: .id)
         try c.encode(airfieldId, forKey: .airfieldId)
+        try c.encodeIfPresent(authorId, forKey: .authorId)
+        try c.encodeIfPresent(authorDisplayName, forKey: .authorDisplayName)
         try c.encode(content, forKey: .content)
         try c.encode(category, forKey: .category)
         try c.encode(createdAt, forKey: .createdAt)
@@ -51,7 +59,7 @@ struct PublicNote: Identifiable, Codable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, airfieldId, content, category, createdAt, updatedAt, thumbsUp, thumbsDown
+        case id, airfieldId, authorId, authorDisplayName, content, category, createdAt, updatedAt, thumbsUp, thumbsDown
     }
 }
 

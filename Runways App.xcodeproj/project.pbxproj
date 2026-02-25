@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D60F29862F4E6EA900C3F4C6 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = D6DBD1802F44BF1400CAFD42 /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D6DBD1622F44BF1400CAFD42 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D60F29862F4E6EA900C3F4C6 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = "Runways App";
 			packageProductDependencies = (
+				D6DBD1802F44BF1400CAFD42 /* Supabase */,
 			);
 			productName = "Runways App";
 			productReference = D6DBD1542F44BF1000CAFD42 /* Runways App.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = D6DBD14B2F44BF1000CAFD42;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D6DBD1812F44BF1400CAFD42 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D6DBD1552F44BF1000CAFD42 /* Products */;
 			projectDirPath = "";
@@ -402,6 +411,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We use your location to remind you to add notes when you're near an airport, even when the app is in the background.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location to remind you to add notes when you're near an airport.";
+				INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_g5iQBKNYV5pNkdYsxyrjUg_312j2jH0;
+				INFOPLIST_KEY_SUPABASE_URL = "https://lkxfjxdvfxgqbuuzgxjl.supabase.co";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIBackgroundModes = location;
@@ -437,6 +448,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "We use your location to remind you to add notes when you're near an airport, even when the app is in the background.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location to remind you to add notes when you're near an airport.";
+				INFOPLIST_KEY_SUPABASE_ANON_KEY = sb_publishable_g5iQBKNYV5pNkdYsxyrjUg_312j2jH0;
+				INFOPLIST_KEY_SUPABASE_URL = "https://lkxfjxdvfxgqbuuzgxjl.supabase.co";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIBackgroundModes = location;
@@ -584,6 +597,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D6DBD1812F44BF1400CAFD42 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D6DBD1802F44BF1400CAFD42 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D6DBD1812F44BF1400CAFD42 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D6DBD14C2F44BF1000CAFD42 /* Project object */;
 }

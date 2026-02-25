@@ -3,6 +3,7 @@
 //  Runways App
 //
 
+import Auth
 import Foundation
 
 /// A post queued to be added to the community board when back online.
@@ -25,8 +26,18 @@ final class PublicBoardStore {
     private let myPostIdsKey = "RunwaysApp.MyPublicNoteIds"
     private let fileManager = FileManager.default
 
+    /// When set and signed in, forum uses Supabase. Injected from view layer.
+    var authService: AuthService?
+
+    private let forumService = ForumService()
+
     init() {
         load()
+    }
+
+    var useSupabase: Bool {
+        guard SupabaseConfig.isConfigured, let auth = authService, auth.isSignedIn else { return false }
+        return true
     }
 
     func notes(for airfieldId: String, category: NoteCategory? = nil) -> [PublicNote] {
@@ -37,7 +48,33 @@ final class PublicBoardStore {
         return result.sorted { $0.createdAt > $1.createdAt }
     }
 
-    func add(airfieldId: String, content: String, category: NoteCategory = .general) {
+    /// Fetch from Supabase when signed in and configured. Call when showing community board for an airfield.
+    func fetchFromSupabaseIfNeeded(airfieldId: String) async {
+        guard useSupabase, let userId = authService?.currentUser?.id else { return }
+        let fetched = await forumService.fetchPosts(airfieldId: airfieldId)
+        let postIds = fetched.map(\.id)
+        let myVotes = await forumService.fetchMyVotes(postIds: postIds, userId: userId)
+        await MainActor.run {
+            notes = notes.filter { $0.airfieldId != airfieldId } + fetched
+            for (id, vote) in myVotes {
+                votes[id] = vote
+            }
+        }
+    }
+
+    /// Add a post. When authorId and authorDisplayName are provided and useSupabase, posts to Supabase.
+    func add(airfieldId: String, content: String, category: NoteCategory = .general, authorId: UUID? = nil, authorDisplayName: String? = nil) {
+        if useSupabase, let authorId = authorId {
+            let name = authorDisplayName ?? ""
+            Task {
+                if let note = await forumService.addPost(airfieldId: airfieldId, authorId: authorId, authorDisplayName: name, content: content, category: category) {
+                    await MainActor.run {
+                        notes.append(note)
+                    }
+                }
+            }
+            return
+        }
         let note = PublicNote(airfieldId: airfieldId, content: content, category: category)
         notes.append(note)
         myPostIds.insert(note.id)
@@ -52,14 +89,15 @@ final class PublicBoardStore {
         savePending()
     }
 
-    /// Process all pending posts into the public board. Call when app is online.
-    func processPendingPosts() {
+    /// Process all pending posts. When authorId and authorDisplayName are provided and useSupabase, posts to Supabase; otherwise adds locally.
+    func processPendingPosts(authorId: UUID? = nil, authorDisplayName: String? = nil) {
         guard !pendingPosts.isEmpty else { return }
-        for pending in pendingPosts {
-            add(airfieldId: pending.airfieldId, content: pending.content, category: pending.category)
-        }
+        let toProcess = pendingPosts
         pendingPosts.removeAll()
         savePending()
+        for pending in toProcess {
+            add(airfieldId: pending.airfieldId, content: pending.content, category: pending.category, authorId: authorId ?? authService?.currentUser?.id, authorDisplayName: authorDisplayName)
+        }
     }
 
     private func savePending() {
@@ -71,6 +109,26 @@ final class PublicBoardStore {
 
     func vote(noteId: UUID, vote: PublicNoteVote.VoteType) {
         guard let index = notes.firstIndex(where: { $0.id == noteId }) else { return }
+        if useSupabase, let userId = authService?.currentUser?.id {
+            Task {
+                let previousVote = await MainActor.run(body: { votes[noteId] })
+                if previousVote == vote {
+                    await forumService.removeVote(postId: noteId, userId: userId)
+                    await MainActor.run {
+                        if vote == .up { notes[index].thumbsUp -= 1 } else { notes[index].thumbsDown -= 1 }
+                        votes.removeValue(forKey: noteId)
+                    }
+                } else {
+                    await forumService.upsertVote(postId: noteId, userId: userId, vote: vote)
+                    await MainActor.run {
+                        if previousVote == .up { notes[index].thumbsUp -= 1 } else if previousVote == .down { notes[index].thumbsDown -= 1 }
+                        if vote == .up { notes[index].thumbsUp += 1 } else { notes[index].thumbsDown += 1 }
+                        votes[noteId] = vote
+                    }
+                }
+            }
+            return
+        }
         let previousVote = votes[noteId]
         if previousVote == .up { notes[index].thumbsUp -= 1 }
         if previousVote == .down { notes[index].thumbsDown -= 1 }
@@ -83,6 +141,17 @@ final class PublicBoardStore {
     func removeVote(noteId: UUID) {
         guard let index = notes.firstIndex(where: { $0.id == noteId }),
               let previousVote = votes[noteId] else { return }
+        if useSupabase, let userId = authService?.currentUser?.id {
+            Task {
+                await forumService.removeVote(postId: noteId, userId: userId)
+                await MainActor.run {
+                    if previousVote == .up { notes[index].thumbsUp -= 1 }
+                    if previousVote == .down { notes[index].thumbsDown -= 1 }
+                    votes.removeValue(forKey: noteId)
+                }
+            }
+            return
+        }
         if previousVote == .up { notes[index].thumbsUp -= 1 }
         if previousVote == .down { notes[index].thumbsDown -= 1 }
         votes.removeValue(forKey: noteId)
@@ -95,11 +164,24 @@ final class PublicBoardStore {
 
     /// Whether the current user (this device) is allowed to delete this note (they created it).
     func canDelete(noteId: UUID) -> Bool {
-        myPostIds.contains(noteId)
+        if useSupabase, let note = notes.first(where: { $0.id == noteId }), let currentId = authService?.currentUser?.id {
+            return note.authorId == currentId
+        }
+        return myPostIds.contains(noteId)
     }
 
     /// Delete a note. Only succeeds if `canDelete(noteId)` is true.
     func delete(noteId: UUID) {
+        if useSupabase, canDelete(noteId: noteId) {
+            Task {
+                await forumService.deletePost(postId: noteId)
+                await MainActor.run {
+                    notes.removeAll { $0.id == noteId }
+                    votes.removeValue(forKey: noteId)
+                }
+            }
+            return
+        }
         guard myPostIds.contains(noteId) else { return }
         notes.removeAll { $0.id == noteId }
         votes.removeValue(forKey: noteId)

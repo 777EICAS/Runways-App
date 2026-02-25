@@ -3,12 +3,15 @@
 //  Runways App
 //
 
+import Auth
 import SwiftUI
 
 struct PublicBoardSection: View {
     let airfieldId: String
     @Bindable var store: PublicBoardStore
     let isOnline: Bool
+    @Environment(AuthService.self) private var auth
+    @Environment(AppSettings.self) private var appSettings
     var onPostTapped: (() -> Void)? = nil
     @State private var isComposing = false
     @State private var newNoteText = ""
@@ -18,6 +21,7 @@ struct PublicBoardSection: View {
     @FocusState private var isComposeFocused: Bool
 
     private var notes: [PublicNote] { store.notes(for: airfieldId, category: selectedCategory) }
+    private var canPost: Bool { isOnline && auth.isSignedIn }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -41,23 +45,28 @@ struct PublicBoardSection: View {
                     }
                     onPostTapped?()
                 } label: {
-                    Label("Post", systemImage: "square.and.pencil")
+                    Label(auth.isSignedIn ? "Post" : "Sign in to post", systemImage: "square.and.pencil")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(AppTheme.lavender)
-                .disabled(!isOnline)
+                .disabled(!canPost)
             }
 
             categoryTabs
 
+            if !auth.isSignedIn {
+                Text("Sign in to post and vote on the community board.")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.textSecondary)
+            }
             if !isOnline {
-                Text("Public notes are cached. Posting and voting require an internet connection.")
+                Text("Posting and voting require an internet connection.")
                     .font(.caption)
                     .foregroundStyle(AppTheme.textSecondary)
             }
 
             if notes.isEmpty && !isComposing {
-                Text("No community notes yet. When online, tap **Post** to share your experience.")
+                Text("No community notes yet. When signed in and online, tap **Post** to share your experience.")
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.textSecondary)
                     .padding(.vertical, 20)
@@ -73,6 +82,9 @@ struct PublicBoardSection: View {
                 composeCard
                     .id("communityBoardComposeCard")
             }
+        }
+        .task {
+            await store.fetchFromSupabaseIfNeeded(airfieldId: airfieldId)
         }
         .alert("Delete post?", isPresented: Binding(
             get: { noteToDelete != nil },
@@ -136,6 +148,11 @@ struct PublicBoardSection: View {
                 Spacer()
                 categoryBadge(note.category)
             }
+            if let name = note.authorDisplayName, !name.isEmpty {
+                Text(name)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(AppTheme.textSecondary)
+            }
             HStack {
                 Text(note.createdAt, style: .date)
                     .font(.caption)
@@ -146,7 +163,7 @@ struct PublicBoardSection: View {
                         thumbsButton(noteId: note.id, vote: .up, count: note.thumbsUp)
                         thumbsButton(noteId: note.id, vote: .down, count: note.thumbsDown)
                     }
-                    .disabled(!isOnline)
+                    .disabled(!isOnline || (store.useSupabase && !auth.isSignedIn))
                     if store.canDelete(noteId: note.id) {
                         Button {
                             noteToDelete = note
@@ -228,7 +245,7 @@ struct PublicBoardSection: View {
                 Button("Post") {
                     let trimmed = newNoteText.trimmingCharacters(in: .whitespacesAndNewlines)
                     if !trimmed.isEmpty {
-                        store.add(airfieldId: airfieldId, content: trimmed, category: newNoteCategory)
+                        store.add(airfieldId: airfieldId, content: trimmed, category: newNoteCategory, authorId: auth.currentUser?.id, authorDisplayName: appSettings.displayName.isEmpty ? nil : appSettings.displayName)
                         newNoteText = ""
                         isComposing = false
                     }
@@ -248,5 +265,7 @@ struct PublicBoardSection: View {
     ScrollView {
         PublicBoardSection(airfieldId: "EGLL", store: PublicBoardStore(), isOnline: true)
             .padding()
+            .environment(AuthService())
+            .environment(AppSettings())
     }
 }

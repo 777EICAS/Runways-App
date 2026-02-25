@@ -3,6 +3,7 @@
 //  Runways App
 //
 
+import Auth
 import SwiftUI
 
 enum AirfieldListMode: String, CaseIterable {
@@ -14,12 +15,14 @@ enum AirfieldListMode: String, CaseIterable {
 struct ContentView: View {
     var notificationRouter: NotificationRouter
     @Environment(AppSettings.self) private var appSettings
+    @Environment(AuthService.self) private var auth
     @Environment(AirfieldLocationService.self) private var locationService
     @State private var showSettings = false
     @State private var privateNotesStore = PrivateNotesStore()
     @State private var publicBoardStore = PublicBoardStore()
     @State private var networkMonitor = NetworkMonitor()
     @State private var favouritesStore = FavouritesStore()
+    @State private var forumRealtimeService = ForumRealtimeService()
     @State private var selectedAirfield: Airfield?
     @State private var searchText = ""
     @State private var listMode: AirfieldListMode = .all
@@ -147,12 +150,15 @@ struct ContentView: View {
         }
         .onChange(of: networkMonitor.isConnected) { _, isConnected in
             if isConnected {
-                publicBoardStore.processPendingPosts()
+                publicBoardStore.processPendingPosts(authorId: auth.currentUser?.id, authorDisplayName: appSettings.displayName.isEmpty ? nil : appSettings.displayName)
             }
         }
         .onAppear {
+            if publicBoardStore.authService == nil {
+                publicBoardStore.authService = auth
+            }
             if networkMonitor.isConnected {
-                publicBoardStore.processPendingPosts()
+                publicBoardStore.processPendingPosts(authorId: auth.currentUser?.id, authorDisplayName: appSettings.displayName.isEmpty ? nil : appSettings.displayName)
             }
         }
         .onChange(of: notificationRouter.pendingAirfieldId) { _, pendingId in
@@ -161,6 +167,61 @@ struct ContentView: View {
                 selectedAirfield = airfield
             }
             notificationRouter.clearPending()
+        }
+        .onChange(of: auth.currentUser?.id) { _, userId in
+            if userId == nil {
+                forumRealtimeService.stop()
+                return
+            }
+            guard let userId else { return }
+            Task {
+                let profileService = ProfileService()
+                // Use local display name and email so we don't overwrite profile with empty on session restore
+                await profileService.ensureProfileExists(
+                    userId: userId,
+                    email: auth.currentUser?.email ?? appSettings.email,
+                    displayName: appSettings.displayName
+                )
+                if let profile = await profileService.fetchProfile(userId: userId) {
+                    favouritesStore.replaceWith(Set(profile.favouriteAirfieldIds))
+                    appSettings.applyFromProfile(displayName: profile.displayName, email: profile.email, settings: profile.settings)
+                }
+                await MainActor.run { updateForumRealtimeSubscription() }
+            }
+        }
+        .onChange(of: favouritesStore.favouriteIds) { _, newIds in
+            guard auth.isSignedIn, !favouritesStore.isApplyingProfile, let userId = auth.currentUser?.id else { return }
+            Task {
+                await ProfileService().updateFavourites(userId: userId, favouriteAirfieldIds: Array(newIds))
+            }
+        }
+        .onChange(of: appSettings.displayName) { _, _ in syncProfileIfNeeded() }
+        .onChange(of: appSettings.email) { _, _ in syncProfileIfNeeded() }
+        .onChange(of: appSettings.profileSettings) { _, _ in syncProfileIfNeeded() }
+        .onChange(of: favouritesStore.favouriteIds) { _, _ in updateForumRealtimeSubscription() }
+        .onChange(of: appSettings.notificationsEnabled) { _, _ in updateForumRealtimeSubscription() }
+        .onChange(of: appSettings.notifyOnNewCommunityPost) { _, _ in updateForumRealtimeSubscription() }
+        .onAppear { updateForumRealtimeSubscription() }
+    }
+
+    private func updateForumRealtimeSubscription() {
+        guard let userId = auth.currentUser?.id else { return }
+        let airfields = airfields
+        forumRealtimeService.start(
+            currentUserId: userId,
+            favouriteAirfieldIds: favouritesStore.favouriteIds,
+            notificationsEnabled: appSettings.notificationsEnabled,
+            notifyOnNewCommunityPost: appSettings.notifyOnNewCommunityPost,
+            airfieldName: { id in airfields.first(where: { $0.id == id })?.name ?? id }
+        )
+    }
+
+    private func syncProfileIfNeeded() {
+        guard auth.isSignedIn, !appSettings.isApplyingProfile, let userId = auth.currentUser?.id else { return }
+        Task {
+            let profileService = ProfileService()
+            await profileService.updateDisplayNameAndEmail(userId: userId, displayName: appSettings.displayName, email: appSettings.email)
+            await profileService.updateSettings(userId: userId, settings: appSettings.profileSettings)
         }
     }
 
@@ -279,5 +340,6 @@ struct ContentView: View {
 #Preview {
     ContentView(notificationRouter: NotificationRouter())
         .environment(AppSettings())
+        .environment(AuthService())
         .environment(AirfieldLocationService())
 }

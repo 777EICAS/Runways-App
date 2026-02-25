@@ -12,6 +12,7 @@ struct Runways_AppApp: App {
     @State private var appSettings = AppSettings()
     @State private var notificationRouter = NotificationRouter()
     @State private var locationService = AirfieldLocationService()
+    @State private var authService = AuthService()
     /// Strong reference so the notification center’s weak delegate is not deallocated.
     @State private var notificationDelegate: AppNotificationDelegate?
 
@@ -24,6 +25,7 @@ struct Runways_AppApp: App {
             .environment(appSettings)
             .environment(locationService)
             .environment(notificationRouter)
+            .environment(authService)
             .onAppear {
                 notificationDelegate = AppNotificationDelegate(router: notificationRouter)
                 UNUserNotificationCenter.current().delegate = notificationDelegate

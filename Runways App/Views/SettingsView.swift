@@ -3,6 +3,7 @@
 //  Runways App
 //
 
+import Auth
 import CoreLocation
 import SwiftUI
 import UIKit
@@ -10,11 +11,15 @@ import UIKit
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var settings: AppSettings
+    @Environment(AuthService.self) private var auth
     var locationService: AirfieldLocationService
+    @State private var showSignIn = false
+    @State private var showSignUp = false
 
     var body: some View {
         NavigationStack {
             Form {
+                accountSection
                 notificationsSection
                 locationSection
                 profileSection
@@ -33,7 +38,57 @@ struct SettingsView: View {
                 }
             }
             .tint(AppTheme.skyBlue)
+            .sheet(isPresented: $showSignIn) {
+                SignInView(auth: auth)
+            }
+            .sheet(isPresented: $showSignUp) {
+                SignUpView(auth: auth)
+            }
         }
+    }
+
+    private var accountSection: some View {
+        Section {
+            if auth.isSignedIn {
+                if let email = auth.currentUser?.email, !email.isEmpty {
+                    HStack {
+                        Text("Signed in as")
+                        Spacer()
+                        Text(email)
+                            .foregroundStyle(AppTheme.textSecondary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+                }
+                Button("Sign out", role: .destructive) {
+                    Task {
+                        await auth.signOut()
+                    }
+                }
+            } else {
+                Button {
+                    showSignIn = true
+                } label: {
+                    Label("Sign in", systemImage: "person.crop.circle")
+                }
+                .foregroundStyle(AppTheme.skyBlue)
+                Button {
+                    showSignUp = true
+                } label: {
+                    Label("Create account", systemImage: "person.badge.plus")
+                }
+                .foregroundStyle(AppTheme.skyBlue)
+            }
+        } header: {
+            Label("Account", systemImage: "person.circle")
+        } footer: {
+            if !auth.isSignedIn {
+                Text("Sign in to sync your favourites and settings, and to post on the community board.")
+            } else {
+                Text("Your favourites and settings sync to your account automatically.")
+            }
+        }
+        .listRowBackground(AppTheme.cardFill)
     }
 
     private var notificationsSection: some View {
@@ -41,10 +96,12 @@ struct SettingsView: View {
             Toggle("Allow notifications", isOn: $settings.notificationsEnabled)
             Toggle("Notify when near an airfield", isOn: $settings.notifyNearAirfield)
                 .disabled(!settings.notificationsEnabled)
+            Toggle("Notify when someone posts on a favourited airfield", isOn: $settings.notifyOnNewCommunityPost)
+                .disabled(!settings.notificationsEnabled)
         } header: {
             Label("Notifications", systemImage: "bell")
         } footer: {
-            Text("When enabled, you can get a reminder to add notes when you're near an airfield.")
+            Text("When enabled, you can get a reminder to add notes when you're near an airfield, and get notified when someone posts on the community board for an airfield you've favourited.")
         }
         .listRowBackground(AppTheme.cardFill)
     }
@@ -115,4 +172,5 @@ struct SettingsView: View {
         settings: AppSettings(),
         locationService: AirfieldLocationService()
     )
+    .environment(AuthService())
 }
